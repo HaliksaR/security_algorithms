@@ -1,6 +1,6 @@
 rootProject.name = "security_algorithms"
-include(":modexp")
-include(":gcd")
-include(":DiffieHellmanKeyExchange")
-include(":core")
-include("BabyStepGiantStep")
+include(":libs:modexp")
+include(":libs:gcd")
+include(":libs:DiffieHellmanKeyExchange")
+include(":libs:core")
+include(":libs:BabyStepGiantStep")
