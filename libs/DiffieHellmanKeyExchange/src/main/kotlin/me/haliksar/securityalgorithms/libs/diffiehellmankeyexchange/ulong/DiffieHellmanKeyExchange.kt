@@ -1,9 +1,9 @@
-package me.haliksar.securityalgorithms.libs.diffiehellmankeyexchange
+package me.haliksar.securityalgorithms.libs.diffiehellmankeyexchange.ulong
 
 import me.haliksar.securityalgorithms.libs.core.prime.isPrime
 import me.haliksar.securityalgorithms.libs.core.prime.randomPrimeNumber
 import me.haliksar.securityalgorithms.libs.core.prime.randomULong
-import me.haliksar.securityalgorithms.libs.modexp.modExp
+import me.haliksar.securityalgorithms.libs.modexp.ulong.modExp
 
 @ExperimentalUnsignedTypes
 fun getRandomPQ(): Pair<ULong, ULong> {

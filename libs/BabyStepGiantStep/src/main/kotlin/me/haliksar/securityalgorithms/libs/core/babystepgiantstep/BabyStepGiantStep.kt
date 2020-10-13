@@ -1,7 +1,7 @@
 package me.haliksar.securityalgorithms.libs.core.babystepgiantstep
 
 import me.haliksar.securityalgorithms.libs.core.prime.randomPrimeNumber
-import me.haliksar.securityalgorithms.libs.modexp.modExp
+import me.haliksar.securityalgorithms.libs.modexp.ulong.modExp
 import kotlin.math.sqrt
 
 /**
@@ -16,11 +16,9 @@ fun babyStepGiantStep(a: ULong, p: ULong, y: ULong, m: ULong): ULong {
     (0uL..(m - 1uL)).forEach { top ->
         map[a.modExp(top, p, y)] = top
     }
-    (1uL..m).forEach { hlup ->
-        val ai = a.modExp(hlup * m, p)
-        val item: ULong? = map[ai]
-        item?.let {
-            val x = hlup * m - item
+    (1uL..m).forEach { top ->
+        map[a.modExp(top * m, p)]?.let {
+            val x = top * m - it
             check(a.modExp(x, p) == y) { "Неверное решение!" }
             return x
         }
