@@ -1,9 +1,6 @@
 package me.haliksar.securityalgorithms.libs.ciphers.ulong
 
 import me.haliksar.securityalgorithms.libs.ciphers.Encrypt
-import me.haliksar.securityalgorithms.libs.ciphers.EncryptWrapper
-import me.haliksar.securityalgorithms.libs.core.fileutils.toFile
-import me.haliksar.securityalgorithms.libs.core.fileutils.toLongList
 import me.haliksar.securityalgorithms.libs.core.prime.multiplicativeInverse
 import me.haliksar.securityalgorithms.libs.core.prime.mutuallyPrime
 import me.haliksar.securityalgorithms.libs.core.prime.randomPrimeNumber
@@ -19,21 +16,37 @@ import me.haliksar.securityalgorithms.libs.modexp.ulong.modExpRec
  * [setB] числа, которые выбрал абонент B
  */
 @ExperimentalUnsignedTypes
-class ShamirCipher : Encrypt<ULong, ULong> {
+class ShamirCipherULong : Encrypt<ULong, ULong, ShamirCipherULong.Keys> {
 
-    private class PrimeSet(prime: ULong) {
+    data class Keys(
+        val setA: PrimeSet,
+        val setB: PrimeSet,
+    ) {
+        override fun toString() = "$setA\n$setB"
+    }
+
+    class PrimeSet(
+        private val name: String,
+        private val prime: ULong
+    ) {
         val mutual: ULong = ULong.mutuallyPrime(prime - 1uL)
         val multiInverse: ULong = ULong.multiplicativeInverse(mutual, prime - 1uL)
+
+        override fun toString() =
+            "$name prime = $prime\n${name}1 = $mutual\n${name}2 = $multiInverse"
+
+        fun printKeys() = println(this)
     }
 
     private var prime: ULong = 0uL
     private lateinit var setA: PrimeSet
     private lateinit var setB: PrimeSet
 
-    override fun generate() {
+    override fun generate(): Keys {
         prime = ULong.randomPrimeNumber
-        setA = PrimeSet(prime)
-        setB = PrimeSet(prime)
+        setA = PrimeSet("A", prime)
+        setB = PrimeSet("B", prime)
+        return Keys(setA, setB)
     }
 
     override fun validate() {
@@ -54,16 +67,4 @@ class ShamirCipher : Encrypt<ULong, ULong> {
         val value = encryptData.modExpRec(setA.multiInverse, prime)
         return value.modExpRec(setB.mutual, prime)
     }
-}
-
-@ExperimentalUnsignedTypes
-fun main() {
-    val path = "libs/ciphers/src/main/resources"
-    val image = "$path/image.jpg".toLongList()
-    val method = ShamirCipher()
-    val wrapper = EncryptWrapper(method)
-    val encrypt = wrapper.encrypt(image.map { it.toULong() })
-    encrypt toFile "$path/encrypt.jpg"
-    val decrypt = wrapper.decrypt(encrypt)
-    decrypt toFile "$path/decrypt.jpg"
 }

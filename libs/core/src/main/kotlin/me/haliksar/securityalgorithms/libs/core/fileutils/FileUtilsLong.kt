@@ -4,7 +4,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Files
 
-@ExperimentalUnsignedTypes
 fun String.toLongList(): List<Long> {
     val list = mutableListOf<Long>()
     for (element in toByteArray())
@@ -19,8 +18,7 @@ fun String.toByteArray(): ByteArray {
 }
 
 @JvmName("toFileLong")
-@ExperimentalUnsignedTypes
-infix fun List<Long>.toFile(name: String) {
+infix fun List<Long>.writeTo(name: String) {
     println("Создаем файл '$name'..")
     val bytes = ByteArray(size)
     for (i in indices) {

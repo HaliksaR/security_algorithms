@@ -1,7 +1,6 @@
 package me.haliksar.securityalgorithms.libs.gcd.long
 
 data class GcdPack
-@ExperimentalUnsignedTypes
 constructor(var nod: Long, var x: Long, var y: Long)
 
 /**
@@ -14,7 +13,6 @@ constructor(var nod: Long, var x: Long, var y: Long)
  * @return [GcdPack] функция возвращает группу где первый элемент это НОД,
  * втророй и третий - две неизвестных функции ax + by
  */
-@ExperimentalUnsignedTypes
 infix fun Long.gcd(b: Long): GcdPack {
     var packU = GcdPack(this, 1L, 0L)
     var packV = GcdPack(b, 0L, 1L)
@@ -43,10 +41,8 @@ infix fun Long.gcd(b: Long): GcdPack {
  * @return [Triple] функция возвращает группу где первый элемент это НОД,
  * втророй и третий - две неизвестных функции ax + by
  */
-@ExperimentalUnsignedTypes
 infix fun Long.gcdTailRec(b: Long): GcdPack = this.goTailRec(b, 0L, 1L, 1L, 0L)
 
-@ExperimentalUnsignedTypes
 private tailrec fun Long.goTailRec(
     b: Long,
     x: Long,
@@ -62,7 +58,6 @@ private tailrec fun Long.goTailRec(
     }
 
 
-@ExperimentalUnsignedTypes
 fun main() {
     println(22L gcd 44L)
     println(22L gcdTailRec 44L)

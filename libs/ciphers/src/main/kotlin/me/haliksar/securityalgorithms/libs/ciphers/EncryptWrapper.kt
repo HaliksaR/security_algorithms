@@ -5,16 +5,20 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 
-class EncryptWrapper<M, E>(
-    private val cipher: Encrypt<M, E>
+class EncryptWrapper<M, E, K>(
+    private val cipher: Encrypt<M, E, K>
 ) {
+
+    fun generate(): K {
+        println("Генерируем значения..")
+        val keys = cipher.generate()
+        println("Проверяем сгенерированные значения..")
+        cipher.validate()
+        return keys
+    }
 
     fun encrypt(messages: List<M>): List<E> =
         runBlocking(Dispatchers.IO) {
-            println("Генерируем значения..")
-            cipher.generate()
-            println("Проверяем сгенерированные значения..")
-            cipher.validate()
             println("Начинаем шифрование..")
             messages.parallelMap { cipher.encrypt(it) }
         }

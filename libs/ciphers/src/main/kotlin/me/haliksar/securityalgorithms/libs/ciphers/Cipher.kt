@@ -1,6 +1,6 @@
 package me.haliksar.securityalgorithms.libs.ciphers
 
-interface Cipher {
-    fun generate()
+interface Cipher<K> {
+    fun generate(): K
     fun validate()
 }

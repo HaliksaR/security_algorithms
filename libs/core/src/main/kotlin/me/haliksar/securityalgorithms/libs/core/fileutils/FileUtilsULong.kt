@@ -12,7 +12,7 @@ fun String.toULongList(): List<ULong> {
 
 @JvmName("toFileULong")
 @ExperimentalUnsignedTypes
-infix fun List<ULong>.toFile(name: String) {
+infix fun List<ULong>.writeTo(name: String) {
     println("Создаем файл '$name'..")
     val bytes = ByteArray(size)
     for (i in indices) {
