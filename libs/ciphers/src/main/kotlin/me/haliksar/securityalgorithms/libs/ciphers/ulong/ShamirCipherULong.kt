@@ -1,9 +1,6 @@
 package me.haliksar.securityalgorithms.libs.ciphers.ulong
 
 import me.haliksar.securityalgorithms.libs.ciphers.Encrypt
-import me.haliksar.securityalgorithms.libs.ciphers.EncryptWrapper
-import me.haliksar.securityalgorithms.libs.core.fileutils.toFile
-import me.haliksar.securityalgorithms.libs.core.fileutils.toLongList
 import me.haliksar.securityalgorithms.libs.core.prime.multiplicativeInverse
 import me.haliksar.securityalgorithms.libs.core.prime.mutuallyPrime
 import me.haliksar.securityalgorithms.libs.core.prime.randomPrimeNumber
@@ -19,7 +16,7 @@ import me.haliksar.securityalgorithms.libs.modexp.ulong.modExpRec
  * [setB] числа, которые выбрал абонент B
  */
 @ExperimentalUnsignedTypes
-class ShamirCipher : Encrypt<ULong, ULong> {
+class ShamirCipherULong : Encrypt<ULong, ULong> {
 
     private class PrimeSet(prime: ULong) {
         val mutual: ULong = ULong.mutuallyPrime(prime - 1uL)
@@ -54,16 +51,4 @@ class ShamirCipher : Encrypt<ULong, ULong> {
         val value = encryptData.modExpRec(setA.multiInverse, prime)
         return value.modExpRec(setB.mutual, prime)
     }
-}
-
-@ExperimentalUnsignedTypes
-fun main() {
-    val path = "libs/ciphers/src/main/resources"
-    val image = "$path/image.jpg".toLongList()
-    val method = ShamirCipher()
-    val wrapper = EncryptWrapper(method)
-    val encrypt = wrapper.encrypt(image.map { it.toULong() })
-    encrypt toFile "$path/encrypt.jpg"
-    val decrypt = wrapper.decrypt(encrypt)
-    decrypt toFile "$path/decrypt.jpg"
 }

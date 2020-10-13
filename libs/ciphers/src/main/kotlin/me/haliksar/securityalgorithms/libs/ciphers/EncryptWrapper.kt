@@ -16,13 +16,17 @@ class EncryptWrapper<M, E>(
             println("Проверяем сгенерированные значения..")
             cipher.validate()
             println("Начинаем шифрование..")
-            messages.parallelMap { cipher.encrypt(it) }
+            messages.parallelMap { cipher.encrypt(it) }.also {
+                println(it.size)
+            }
         }
 
     fun decrypt(messages: List<E>): List<M> =
         runBlocking(Dispatchers.IO) {
             println("Начинаем расшифровку..")
-            messages.parallelMap { cipher.decrypt(it) }
+            messages.parallelMap { cipher.decrypt(it) }.also {
+                println(it.size)
+            }
         }
 
     private suspend fun <T, R> List<T>.parallelMap(block: suspend (T) -> R) =

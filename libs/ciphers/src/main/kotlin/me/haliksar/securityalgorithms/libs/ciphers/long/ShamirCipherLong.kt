@@ -1,9 +1,6 @@
 package me.haliksar.securityalgorithms.libs.ciphers.long
 
 import me.haliksar.securityalgorithms.libs.ciphers.Encrypt
-import me.haliksar.securityalgorithms.libs.ciphers.EncryptWrapper
-import me.haliksar.securityalgorithms.libs.core.fileutils.toFile
-import me.haliksar.securityalgorithms.libs.core.fileutils.toLongList
 import me.haliksar.securityalgorithms.libs.core.prime.multiplicativeInverse
 import me.haliksar.securityalgorithms.libs.core.prime.mutuallyPrime
 import me.haliksar.securityalgorithms.libs.core.prime.randomPrimeNumber
@@ -19,11 +16,21 @@ import me.haliksar.securityalgorithms.libs.modexp.long.modExpRec
  * [setB] числа, которые выбрал абонент B
  */
 @ExperimentalUnsignedTypes
-class ShamirCipher : Encrypt<Long, Long> {
+class ShamirCipherLong : Encrypt<Long, Long> {
 
-    private class PrimeSet(prime: Long) {
+    private class PrimeSet(
+        private val name: String,
+        private val prime: Long
+    ) {
         val mutual: Long = Long.mutuallyPrime(prime - 1L)
         val multiInverse: Long = Long.multiplicativeInverse(mutual, prime - 1)
+
+        fun printKeys(): PrimeSet {
+            println("${name} prime = $prime")
+            println("${name}1 = $mutual")
+            println("${name}2 = $multiInverse")
+            return this
+        }
     }
 
     private var prime: Long = 0L
@@ -32,16 +39,19 @@ class ShamirCipher : Encrypt<Long, Long> {
 
     override fun generate() {
         prime = Long.randomPrimeNumber
-        setA = PrimeSet(prime)
-        setB = PrimeSet(prime)
+        setA = PrimeSet("A", prime).printKeys()
+        setB = PrimeSet("B", prime).printKeys()
     }
 
     override fun validate() {
         check(setA.mutual.gcdTailRec(prime - 1L).nod == 1L) {
-            "Число mutuallyPrime1=$setA.mutual должно быть взаимно простое с prime-1 = ${prime - 1L}"
+            "Число mutuallyPrime1=$setA.mutual должно быть взаимно простое с p - 1 = ${prime - 1L}"
         }
-        check(((setA.mutual % (prime - 1L)) * (setA.multiInverse % (prime - 1L))) % (prime - 1L) == 1L) {
-            "Нарушено условие '(d * e) mod(p - 1) = 1 [d = ${setA.multiInverse}, e = ${setA.mutual}, p = $prime]"
+        val mod = prime - 1L
+        val modMutual = setA.mutual % mod
+        val modMultiInverse = setA.multiInverse % mod
+        check((modMultiInverse * modMutual) % mod == 1L) {
+            "Нарушено условие '(y1 * y2) mod(p - 1) = 1 [y1 = ${setA.multiInverse}, y2 = ${setA.mutual}, p = $prime]"
         }
     }
 
@@ -54,16 +64,4 @@ class ShamirCipher : Encrypt<Long, Long> {
         val value = encryptData.modExpRec(setA.multiInverse, prime)
         return value.modExpRec(setB.mutual, prime)
     }
-}
-
-@ExperimentalUnsignedTypes
-fun main() {
-    val path = "libs/ciphers/src/main/resources"
-    val image = "$path/image.jpg".toLongList()
-    val method = ShamirCipher()
-    val wrapper = EncryptWrapper(method)
-    val encrypt = wrapper.encrypt(image)
-    encrypt toFile "$path/encrypt.jpg"
-    val decrypt = wrapper.decrypt(encrypt)
-    decrypt toFile "$path/decrypt.jpg"
 }
