@@ -12,18 +12,18 @@ fun String.fileToLongList(): List<Long> {
     return list.toList()
 }
 
-fun String.fileToByteArray(): ByteArray {
-    println("Считываем файл..")
+fun String.fileToByteArray(dump: Boolean = true): ByteArray {
+    if (dump) println("Считываем файл..")
     val file = File(this)
     return Files.readAllBytes(file.toPath())
 }
 
-fun List<Long>.writeTo(dir: String, name: String) {
+fun List<Long>.writeTo(dir: String, name: String, dump: Boolean = true) {
     val dir = File(dir)
     if (!dir.exists()) {
         dir.mkdirs()
     }
-    println("Создаем файл '$name'..")
+    if (dump) println("Создаем файл '$name'..")
     val bytes = ByteArray(size)
     for (i in indices) {
         bytes[i] = get(i).toByte()
@@ -33,12 +33,12 @@ fun List<Long>.writeTo(dir: String, name: String) {
     }
 }
 
-fun Any.writeTo(dir: String, name: String) {
+fun Any.writeTo(dir: String, name: String, dump: Boolean = true) {
     val dir = File(dir)
     if (!dir.exists()) {
         dir.mkdirs()
     }
-    println("Создаем файл '$name'..")
+    if (dump) println("Создаем файл '$name'..")
     FileWriter("${dir.absolutePath}/$name").use {
         it.write(this.toString())
     }
