@@ -2,6 +2,7 @@ package me.haliksar.securityalgorithms.libs.core.fileutils
 
 import java.io.File
 import java.io.FileOutputStream
+import java.io.FileWriter
 import java.nio.file.Files
 
 fun String.fileToLongList(): List<Long> {
@@ -29,5 +30,16 @@ fun List<Long>.writeTo(dir: String, name: String) {
     }
     FileOutputStream("${dir.absolutePath}/$name").use { stream ->
         stream.write(bytes)
+    }
+}
+
+fun Any.writeTo(dir: String, name: String) {
+    val dir = File(dir)
+    if (!dir.exists()) {
+        dir.mkdirs()
+    }
+    println("Создаем файл '$name'..")
+    FileWriter("${dir.absolutePath}/$name").use {
+        it.write(this.toString())
     }
 }

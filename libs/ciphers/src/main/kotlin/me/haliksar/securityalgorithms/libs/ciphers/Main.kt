@@ -1,6 +1,7 @@
 package me.haliksar.securityalgorithms.libs.ciphers
 
 import me.haliksar.securityalgorithms.libs.ciphers.cipher.ElGamaliaCipherLong
+import me.haliksar.securityalgorithms.libs.ciphers.cipher.RsaCipherLong
 import me.haliksar.securityalgorithms.libs.ciphers.cipher.ShamirCipherLong
 import me.haliksar.securityalgorithms.libs.ciphers.cipher.VernamCipherLong
 import me.haliksar.securityalgorithms.libs.ciphers.wrapper.EncryptWrapper
@@ -8,77 +9,109 @@ import me.haliksar.securityalgorithms.libs.ciphers.wrapper.SignatureWrapper
 import me.haliksar.securityalgorithms.libs.core.fileutils.fileToByteArray
 import me.haliksar.securityalgorithms.libs.core.fileutils.fileToLongList
 import me.haliksar.securityalgorithms.libs.core.fileutils.writeTo
-import java.io.File
-import java.io.FileWriter
 
-const val path = "libs/ciphers/src/main/resources"
+const val resource = "libs/ciphers/src/main/resources"
 
 val dataSources = mapOf(
     "megumin" to ".png",
-    "file" to ".pdf",
-    "image" to ".jpg",
+/*    "file" to ".pdf",
+    "image" to ".jpg",*/
 )
 
-fun Any.writeTo(dir: String, name: String) {
-    val dir = File(dir)
-    if (!dir.exists()) {
-        dir.mkdirs()
-    }
-    println("Создаем файл '$name'..")
-    FileWriter("${dir.absolutePath}/$name").use {
-        it.write(this.toString())
-    }
-}
-
 fun shamirCipherLong() {
-    val path1 = "$path/ShamirCipher"
+    val path = "$resource/ShamirCipher"
     dataSources.forEach { (name, type) ->
-        val file = "$path/$name$type".fileToLongList()
+        val file = "$resource/$name$type".fileToLongList()
         val method = ShamirCipherLong()
-        val wrapper = EncryptWrapper(method)
+        val wrapper = EncryptWrapper("ShamirCipher", method)
         wrapper.generate()
-        method.keys?.writeTo("$path1/keys/", "${name}_keys.txt")
+        method.keys?.writeTo("$path/keys/", "${name}_keys.txt")
         val encrypt = wrapper.encrypt(file, true)
-        encrypt.writeTo("$path1/encrypt/", "${name}_encrypt$type")
+        encrypt.writeTo("$path/encrypt/", "${name}_encrypt$type")
         val decrypt = wrapper.decrypt(encrypt, true)
-        decrypt.writeTo("$path1/decrypt/", "${name}_decrypt$type")
+        decrypt.writeTo("$path/decrypt/", "${name}_decrypt$type")
     }
 }
 
 fun vernamCipherLong() {
-    val path1 = "$path/VernamCipher"
+    val path = "$resource/VernamCipher"
     dataSources.forEach { (name, type) ->
-        val file = "$path/$name$type".fileToLongList()
+        val file = "$resource/$name$type".fileToLongList()
         val method = VernamCipherLong()
-        val wrapper = EncryptWrapper(method)
-        method.keys?.writeTo("$path1/keys/", "${name}_keys.txt")
+        val wrapper = EncryptWrapper("VernamCipher", method)
+        method.keys?.writeTo("$path/keys/", "${name}_keys.txt")
         val encrypt = wrapper.encrypt(file, false)
-        encrypt.writeTo("$path1/encrypt/", "${name}_encrypt$type")
+        encrypt.writeTo("$path/encrypt/", "${name}_encrypt$type")
         val decrypt = wrapper.decrypt(encrypt, true)
-        decrypt.writeTo("$path1/decrypt/", "${name}_decrypt$type")
+        decrypt.writeTo("$path/decrypt/", "${name}_decrypt$type")
+    }
+}
+
+fun rsaCipherLong() {
+    val path = "$resource/RsaCipher"
+    dataSources.forEach { (name, type) ->
+        val file = "$resource/$name$type".fileToLongList()
+        val method = RsaCipherLong()
+        val wrapper = EncryptWrapper("RsaCipher", method)
+        wrapper.generate()
+        method.keys?.writeTo("$path/keys/", "${name}_keys.txt")
+        val encrypt = wrapper.encrypt(file, false)
+        encrypt.writeTo("$path/encrypt/", "${name}_encrypt$type")
+        val decrypt = wrapper.decrypt(encrypt, true)
+        decrypt.writeTo("$path/decrypt/", "${name}_decrypt$type")
+    }
+}
+
+fun rsaCipherLongSignature() {
+    val path = "$resource/RsaCipherSignature"
+    dataSources.forEach { (name, type) ->
+        val file = "$resource/$name$type".fileToByteArray()
+        val method = RsaCipherLong()
+        val wrapper = SignatureWrapper("RsaCipherSignature", method)
+        wrapper.generate()
+        method.keys?.writeTo("$path/keys/", "${name}_keys.txt")
+        val hash = wrapper.sing(file.toList(), false)
+        val verify = wrapper.verify(hash, false)
+        verify.writeTo("$path/verify/", "${name}_verify.txt")
     }
 }
 
 fun elGamaliaCipherLong() {
-    val path2 = "$path/ElGamaliaCipher"
+    val path = "$resource/ElGamaliaCipher"
     dataSources.forEach { (name, type) ->
-        val file = "$path/$name$type".fileToByteArray()
+        val file = "$resource/$name$type".fileToLongList()
         val method = ElGamaliaCipherLong()
-        val wrapper = SignatureWrapper(method)
+        val wrapper = EncryptWrapper("ElGamaliaCipher", method)
         wrapper.generate()
-        method.keys?.writeTo("$path2/keys/", "${name}_keys.txt")
+        method.keys?.writeTo("$path/keys/", "${name}_keys.txt")
+        val encrypt = wrapper.encrypt(file, false)
+        encrypt.writeTo("$path/encrypt/", "${name}_encrypt$type")
+        val decrypt = wrapper.decrypt(encrypt, true)
+        decrypt.writeTo("$path/decrypt/", "${name}_decrypt$type")
+    }
+}
+
+fun elGamaliaCipherLongSignature() {
+    val path = "$resource/ElGamaliaCipherSignature"
+    dataSources.forEach { (name, type) ->
+        val file = "$resource/$name$type".fileToByteArray()
+        val method = ElGamaliaCipherLong()
+        val wrapper = SignatureWrapper("ElGamaliaCipherSignature", method)
+        wrapper.generate()
+        method.keys?.writeTo("$path/keys/", "${name}_keys.txt")
         val hash = wrapper.sing(file.toList(), false)
-        if (wrapper.verify(hash, true)) {
-            println("Верификация прошла успешно!")
-        } else {
-            println("Ошибка верификации")
-        }
+        val verify = wrapper.verify(hash, false)
+        verify.writeTo("$path/verify/", "${name}_verify.txt")
     }
 }
 
 @ExperimentalUnsignedTypes
 fun main() {
-/*    shamirCipherLong()
-    elGamaliaCipherLong()*/
+    shamirCipherLong()
     vernamCipherLong()
+    elGamaliaCipherLong()
+    rsaCipherLong()
+
+    elGamaliaCipherLongSignature()
+    rsaCipherLongSignature()
 }

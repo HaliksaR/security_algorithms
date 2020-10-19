@@ -7,19 +7,31 @@ import kotlinx.coroutines.runBlocking
 import me.haliksar.securityalgorithms.libs.ciphers.contract.ElectronicSignature
 
 class SignatureWrapper<M, E, K>(
-    private val cipher: ElectronicSignature<M, E, K>
+    name: String,
+    private val cipher: ElectronicSignature<M, E, K>,
+    private val dump: Boolean = true
 ) {
 
+    private fun dump(message: String) {
+        if (dump) {
+            println(message)
+        }
+    }
+
+    init {
+        dump(name)
+    }
+
     fun generate() {
-        println("Генерируем значения..")
+        dump("Генерируем значения..")
         cipher.generate()
-        println("Проверяем сгенерированные значения..")
+        dump("Проверяем сгенерированные значения..")
         cipher.validate()
     }
 
     fun sing(messages: List<M>, parallel: Boolean): List<E> =
         runBlocking(Dispatchers.IO) {
-            println("Начинаем подпись ключей..")
+            dump("Начинаем подпись ключей..")
             if (parallel) {
                 messages.parallelMap { cipher.sign(it) }
             } else {
@@ -29,11 +41,17 @@ class SignatureWrapper<M, E, K>(
 
     fun verify(hash: List<E>, parallel: Boolean): Boolean =
         runBlocking(Dispatchers.IO) {
-            println("Начинаем расшифровку..")
+            dump("Начинаем расшифровку..")
             if (parallel) {
                 hash.parallelMap { cipher.verify(it) }.none { !it }
             } else {
                 hash.map { cipher.verify(it) }.none { !it }
+            }.also {
+                if (it) {
+                    dump("Верификация прошла успешно!")
+                } else {
+                    dump("Ошибка верификации")
+                }
             }
         }
 

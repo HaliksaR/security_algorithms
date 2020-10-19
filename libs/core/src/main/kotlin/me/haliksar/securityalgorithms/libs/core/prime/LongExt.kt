@@ -23,6 +23,15 @@ val Long.Companion.randomPrimeNumber: Long
         return x
     }
 
+val Long.Companion.shortPrimeNumber: Long
+    get() {
+        var x: Long
+        do {
+            x = Random.nextLong(32500, 45000)
+        } while (!x.isPrime())
+        return x
+    }
+
 /**
  * Получить взаимно простое число с [x]
  */

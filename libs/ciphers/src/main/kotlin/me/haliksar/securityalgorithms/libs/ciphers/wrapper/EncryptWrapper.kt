@@ -7,19 +7,31 @@ import kotlinx.coroutines.runBlocking
 import me.haliksar.securityalgorithms.libs.ciphers.contract.Encrypt
 
 class EncryptWrapper<M, E, K>(
-    private val cipher: Encrypt<M, E, K>
+    name: String,
+    private val cipher: Encrypt<M, E, K>,
+    private val dump: Boolean = true
 ) {
 
+    private fun dump(message: String) {
+        if (dump) {
+            println(message)
+        }
+    }
+
+    init {
+        dump(name)
+    }
+
     fun generate() {
-        println("Генерируем значения..")
+        dump("Генерируем значения..")
         cipher.generate()
-        println("Проверяем сгенерированные значения..")
+        dump("Проверяем сгенерированные значения..")
         cipher.validate()
     }
 
     fun encrypt(messages: List<M>, parallel: Boolean): List<E> =
         runBlocking(Dispatchers.IO) {
-            println("Начинаем шифрование..")
+            dump("Начинаем шифрование..")
             if (parallel) {
                 messages.parallelMap { cipher.encrypt(it) }
             } else {
@@ -29,7 +41,7 @@ class EncryptWrapper<M, E, K>(
 
     fun decrypt(messages: List<E>, parallel: Boolean): List<M> =
         runBlocking(Dispatchers.IO) {
-            println("Начинаем расшифровку..")
+            dump("Начинаем расшифровку..")
             if (parallel) {
                 messages.parallelMap { cipher.decrypt(it) }
             } else {
