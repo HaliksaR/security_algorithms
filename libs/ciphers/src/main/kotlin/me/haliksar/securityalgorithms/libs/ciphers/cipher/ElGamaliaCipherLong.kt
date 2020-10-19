@@ -26,7 +26,7 @@ class ElGamaliaCipherLong :
     private var keysData: Keys by Delegates.notNull()
 
     override fun generate() {
-        val p = Long.pq().first
+        val p = Long.pq.first
         val x = Long.antiderivative(p)
         val g = Long.antiderivative(p)
         val k = Long.antiderivative(p)

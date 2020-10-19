@@ -1,9 +1,6 @@
 package me.haliksar.securityalgorithms.libs.ciphers
 
-import me.haliksar.securityalgorithms.libs.ciphers.cipher.ElGamaliaCipherLong
-import me.haliksar.securityalgorithms.libs.ciphers.cipher.RsaCipherLong
-import me.haliksar.securityalgorithms.libs.ciphers.cipher.ShamirCipherLong
-import me.haliksar.securityalgorithms.libs.ciphers.cipher.VernamCipherLong
+import me.haliksar.securityalgorithms.libs.ciphers.cipher.*
 import me.haliksar.securityalgorithms.libs.ciphers.wrapper.EncryptWrapper
 import me.haliksar.securityalgorithms.libs.ciphers.wrapper.SignatureWrapper
 import me.haliksar.securityalgorithms.libs.core.fileutils.fileToByteArray
@@ -14,8 +11,8 @@ const val resource = "libs/ciphers/src/main/resources"
 
 val dataSources = mapOf(
     "megumin" to ".png",
-/*    "file" to ".pdf",
-    "image" to ".jpg",*/
+    "file" to ".pdf",
+    "image" to ".jpg",
 )
 
 fun shamirCipherLong() {
@@ -105,7 +102,20 @@ fun elGamaliaCipherLongSignature() {
     }
 }
 
-@ExperimentalUnsignedTypes
+fun gostElectronicSignatureLongSignature() {
+    val path = "$resource/GostElectronicSignature"
+    dataSources.forEach { (name, type) ->
+        val file = "$resource/$name$type".fileToByteArray()
+        val method = GostElectronicSignatureLong()
+        val wrapper = SignatureWrapper("GostElectronicSignature", method)
+        wrapper.generate()
+        method.keys?.writeTo("$path/keys/", "${name}_keys.txt")
+        val hash = wrapper.sing(file.toList(), true)
+        val verify = wrapper.verify(hash, true)
+        verify.writeTo("$path/verify/", "${name}_verify.txt")
+    }
+}
+
 fun main() {
     shamirCipherLong()
     vernamCipherLong()
@@ -114,4 +124,6 @@ fun main() {
 
     elGamaliaCipherLongSignature()
     rsaCipherLongSignature()
+
+    gostElectronicSignatureLongSignature()
 }
