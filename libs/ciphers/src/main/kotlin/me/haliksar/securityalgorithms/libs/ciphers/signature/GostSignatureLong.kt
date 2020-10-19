@@ -7,8 +7,8 @@ import me.haliksar.securityalgorithms.libs.gcd.long.gcdTailRec
 import me.haliksar.securityalgorithms.libs.modexp.long.modExpRec
 import kotlin.properties.Delegates
 
-class GostElectronicSignatureLong :
-    ElectronicSignature<Byte, GostElectronicSignatureLong.HashData, GostElectronicSignatureLong.Keys> {
+class GostSignatureLong :
+    ElectronicSignature<Byte, GostSignatureLong.HashData, GostSignatureLong.Keys> {
 
     data class HashData(val m: Byte, val r: Long, val s: Long)
 

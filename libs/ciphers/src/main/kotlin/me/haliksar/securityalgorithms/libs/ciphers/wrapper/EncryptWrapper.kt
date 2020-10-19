@@ -23,15 +23,15 @@ class EncryptWrapper<M, E, K>(
     }
 
     fun generate() {
-        dump("Генерируем значения..")
+        dump("Генерируем значения...")
         cipher.generate()
-        dump("Проверяем сгенерированные значения..")
+        dump("Проверяем сгенерированные значения...")
         cipher.validate()
     }
 
     fun encrypt(messages: List<M>, parallel: Boolean): List<E> =
         runBlocking(Dispatchers.IO) {
-            dump("Начинаем шифрование..")
+            dump("Начинаем шифрование...")
             if (parallel) {
                 messages.parallelMap { cipher.encrypt(it) }
             } else {
@@ -41,7 +41,7 @@ class EncryptWrapper<M, E, K>(
 
     fun decrypt(messages: List<E>, parallel: Boolean): List<M> =
         runBlocking(Dispatchers.IO) {
-            dump("Начинаем расшифровку..")
+            dump("Начинаем расшифровку...")
             if (parallel) {
                 messages.parallelMap { cipher.decrypt(it) }
             } else {

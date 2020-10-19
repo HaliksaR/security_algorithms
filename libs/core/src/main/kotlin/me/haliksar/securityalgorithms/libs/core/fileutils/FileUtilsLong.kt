@@ -13,7 +13,7 @@ fun String.fileToLongList(dump: Boolean = true): List<Long> {
 }
 
 fun String.fileToByteArray(dump: Boolean = true): ByteArray {
-    if (dump) println("Считываем файл..")
+    if (dump) println("Считываем файл...")
     val file = File(this)
     return Files.readAllBytes(file.toPath())
 }
@@ -23,7 +23,7 @@ fun List<Long>.writeTo(dir: String, name: String, dump: Boolean = true) {
     if (!dir.exists()) {
         dir.mkdirs()
     }
-    if (dump) println("Создаем файл '$name'..")
+    if (dump) println("Создаем файл '$name'...")
     val bytes = ByteArray(size)
     for (i in indices) {
         bytes[i] = get(i).toByte()
@@ -38,7 +38,7 @@ fun Any.writeTo(dir: String, name: String, dump: Boolean = true) {
     if (!dir.exists()) {
         dir.mkdirs()
     }
-    if (dump) println("Создаем файл '$name'..")
+    if (dump) println("Создаем файл '$name'...")
     FileWriter("${dir.absolutePath}/$name").use {
         it.write(this.toString())
     }

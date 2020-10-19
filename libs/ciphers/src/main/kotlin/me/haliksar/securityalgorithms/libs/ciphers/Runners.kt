@@ -4,8 +4,8 @@ import me.haliksar.securityalgorithms.libs.ciphers.encrypt.ElGamaliaCipherLong
 import me.haliksar.securityalgorithms.libs.ciphers.encrypt.RsaCipherLong
 import me.haliksar.securityalgorithms.libs.ciphers.encrypt.ShamirCipherLong
 import me.haliksar.securityalgorithms.libs.ciphers.encrypt.VernamCipherLong
-import me.haliksar.securityalgorithms.libs.ciphers.signature.ElGamaliaCipherSignatureLong
-import me.haliksar.securityalgorithms.libs.ciphers.signature.GostElectronicSignatureLong
+import me.haliksar.securityalgorithms.libs.ciphers.signature.ElGamaliaSignatureLong
+import me.haliksar.securityalgorithms.libs.ciphers.signature.GostSignatureLong
 import me.haliksar.securityalgorithms.libs.ciphers.signature.RsaCipherSignatureLong
 import me.haliksar.securityalgorithms.libs.ciphers.wrapper.EncryptWrapper
 import me.haliksar.securityalgorithms.libs.ciphers.wrapper.SignatureWrapper
@@ -52,18 +52,6 @@ fun rsaCipherLong(dataSource: Pair<String, String>, dump: Boolean = true) {
     decrypt.writeTo("$path/decrypt/", "${dataSource.first}_decrypt${dataSource.second}", dump)
 }
 
-fun rsaCipherLongSignature(dataSource: Pair<String, String>, dump: Boolean = true) {
-    val path = "$resource/RsaCipherSignature"
-    val file = "$resource/${dataSource.first}${dataSource.second}".fileToByteArray(dump)
-    val method = RsaCipherSignatureLong()
-    val wrapper = SignatureWrapper("RsaCipherSignature", method, dump)
-    wrapper.generate()
-    method.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)
-    val hash = wrapper.sing(file.toList(), false)
-    val verify = wrapper.verify(hash, false)
-    verify.writeTo("$path/verify/", "${dataSource.first}_verify.txt", dump)
-}
-
 fun elGamaliaCipherLong(dataSource: Pair<String, String>, dump: Boolean = true) {
     val path = "$resource/ElGamaliaCipher"
     val file = "$resource/${dataSource.first}${dataSource.second}".fileToLongList(dump)
@@ -77,10 +65,22 @@ fun elGamaliaCipherLong(dataSource: Pair<String, String>, dump: Boolean = true) 
     decrypt.writeTo("$path/decrypt/", "${dataSource.first}_decrypt${dataSource.second}", dump)
 }
 
-fun elGamaliaCipherLongSignature(dataSource: Pair<String, String>, dump: Boolean = true) {
-    val path = "$resource/ElGamaliaCipherSignature"
+fun rsaLongSignature(dataSource: Pair<String, String>, dump: Boolean = true) {
+    val path = "$resource/RsaSignature"
     val file = "$resource/${dataSource.first}${dataSource.second}".fileToByteArray(dump)
-    val method = ElGamaliaCipherSignatureLong()
+    val method = RsaCipherSignatureLong()
+    val wrapper = SignatureWrapper("RsaCipherSignature", method, dump)
+    wrapper.generate()
+    method.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)
+    val hash = wrapper.sing(file.toList(), false)
+    val verify = wrapper.verify(hash, false)
+    verify.writeTo("$path/verify/", "${dataSource.first}_verify.txt", dump)
+}
+
+fun elGamaliaLongSignature(dataSource: Pair<String, String>, dump: Boolean = true) {
+    val path = "$resource/ElGamaliaSignature"
+    val file = "$resource/${dataSource.first}${dataSource.second}".fileToByteArray(dump)
+    val method = ElGamaliaSignatureLong()
     val wrapper = SignatureWrapper("ElGamaliaCipherSignature", method, dump)
     wrapper.generate()
     method.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)
@@ -89,10 +89,10 @@ fun elGamaliaCipherLongSignature(dataSource: Pair<String, String>, dump: Boolean
     verify.writeTo("$path/verify/", "${dataSource.first}_verify.txt", dump)
 }
 
-fun gostElectronicSignatureLongSignature(dataSource: Pair<String, String>, dump: Boolean = true) {
-    val path = "$resource/GostElectronicSignature"
+fun gostLongSignature(dataSource: Pair<String, String>, dump: Boolean = true) {
+    val path = "$resource/GostSignature"
     val file = "$resource/${dataSource.first}${dataSource.second}".fileToByteArray(dump)
-    val method = GostElectronicSignatureLong()
+    val method = GostSignatureLong()
     val wrapper = SignatureWrapper("GostElectronicSignature", method, dump)
     wrapper.generate()
     method.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)

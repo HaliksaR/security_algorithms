@@ -23,15 +23,15 @@ class SignatureWrapper<M, E, K>(
     }
 
     fun generate() {
-        dump("Генерируем значения..")
+        dump("Генерируем значения...")
         cipher.generate()
-        dump("Проверяем сгенерированные значения..")
+        dump("Проверяем сгенерированные значения...")
         cipher.validate()
     }
 
     fun sing(messages: List<M>, parallel: Boolean): List<E> =
         runBlocking(Dispatchers.IO) {
-            dump("Начинаем подпись ключей..")
+            dump("Начинаем подпись ключей...")
             if (parallel) {
                 messages.parallelMap { cipher.sign(it) }
             } else {
@@ -41,7 +41,7 @@ class SignatureWrapper<M, E, K>(
 
     fun verify(hash: List<E>, parallel: Boolean): Boolean =
         runBlocking(Dispatchers.IO) {
-            dump("Начинаем расшифровку..")
+            dump("Начинаем расшифровку...")
             if (parallel) {
                 hash.parallelMap { cipher.verify(it) }.none { !it }
             } else {

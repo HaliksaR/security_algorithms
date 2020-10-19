@@ -10,8 +10,8 @@ import me.haliksar.securityalgorithms.libs.gcd.long.gcdTailRec
 import me.haliksar.securityalgorithms.libs.modexp.long.modExpRec
 import kotlin.properties.Delegates
 
-class ElGamaliaCipherSignatureLong :
-    ElectronicSignature<Byte, ElGamaliaCipherSignatureLong.HashData, ElGamaliaCipherSignatureLong.Keys> {
+class ElGamaliaSignatureLong :
+    ElectronicSignature<Byte, ElGamaliaSignatureLong.HashData, ElGamaliaSignatureLong.Keys> {
 
     data class HashData(val m: Byte, val r: Long, val s: Long, val y: Long, val p: Long, val g: Long)
 

@@ -1,9 +1,10 @@
 package me.haliksar.securityalgorithms.libs.ciphers
 
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.flowOn
 
 const val resource = "libs/ciphers/src/main/resources"
 
@@ -16,18 +17,25 @@ val dataSources: Flow<Pair<String, String>> = mapOf(
     "file" to ".pdf",
     "image" to ".jpg",
     "Лабораторные работы" to ".pdf",
-).asFlow()
+).asFlow().flowOn(Dispatchers.IO)
 
-fun main(): Unit = runBlocking {
+val CoroutineScope.jobs: (Pair<String, String>, Boolean) -> List<Deferred<Unit>>
+    get() = { data, dump ->
+        listOf(
+            async { shamirCipherLong(data, dump) },
+            async { vernamCipherLong(data, dump) },
+            async { elGamaliaCipherLong(data, dump) },
+            async { rsaCipherLong(data, dump) },
+
+            async { elGamaliaLongSignature(data, dump) },
+            async { rsaLongSignature(data, dump) },
+            async { gostLongSignature(data, dump) }
+        )
+    }
+
+fun main(): Unit = runBlocking(Dispatchers.IO) {
     val dump = true
     dataSources.collect {
-        shamirCipherLong(it, dump)
-        vernamCipherLong(it, dump)
-        elGamaliaCipherLong(it, dump)
-        rsaCipherLong(it, dump)
-
-        elGamaliaCipherLongSignature(it, dump)
-        rsaCipherLongSignature(it, dump)
-        gostElectronicSignatureLongSignature(it, dump)
+        jobs(it, dump).forEach { it.await() }
     }
 }
