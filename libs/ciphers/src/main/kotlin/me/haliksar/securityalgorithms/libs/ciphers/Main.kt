@@ -92,7 +92,7 @@ fun elGamaliaCipherLongSignature() {
     val path = "$resource/ElGamaliaCipherSignature"
     dataSources.forEach { (name, type) ->
         val file = "$resource/$name$type".fileToByteArray()
-        val method = ElGamaliaCipherLong()
+        val method = ElGamaliaCipherSignatureLong()
         val wrapper = SignatureWrapper("ElGamaliaCipherSignature", method)
         wrapper.generate()
         method.keys?.writeTo("$path/keys/", "${name}_keys.txt")
@@ -117,13 +117,13 @@ fun gostElectronicSignatureLongSignature() {
 }
 
 fun main() {
-    shamirCipherLong()
-    vernamCipherLong()
+//    shamirCipherLong()
+//    vernamCipherLong()
     elGamaliaCipherLong()
-    rsaCipherLong()
+//    rsaCipherLong()
 
     elGamaliaCipherLongSignature()
-    rsaCipherLongSignature()
+//    rsaCipherLongSignature()
 
-    gostElectronicSignatureLongSignature()
+//    gostElectronicSignatureLongSignature()
 }
