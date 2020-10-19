@@ -19,14 +19,15 @@ val dataSources: Flow<Pair<String, String>> = mapOf(
 ).asFlow()
 
 fun main(): Unit = runBlocking {
+    val dump = true
     dataSources.collect {
-        shamirCipherLong(it, false)
-        vernamCipherLong(it, false)
-        elGamaliaCipherLong(it, false)
-        rsaCipherLong(it, false)
+        shamirCipherLong(it, dump)
+        vernamCipherLong(it, dump)
+        elGamaliaCipherLong(it, dump)
+        rsaCipherLong(it, dump)
 
-        elGamaliaCipherLongSignature(it, false)
-        rsaCipherLongSignature(it, false)
-        gostElectronicSignatureLongSignature(it, false)
+        elGamaliaCipherLongSignature(it, dump)
+        rsaCipherLongSignature(it, dump)
+        gostElectronicSignatureLongSignature(it, dump)
     }
 }

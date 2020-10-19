@@ -18,8 +18,7 @@ class ElGamaliaCipherSignatureLong :
     data class Keys(var p: Long, var g: Long, var x: Long, var y: Long, var k: Long)
 
     override var keys: Keys? = null
-
-    private var keysData: Keys by Delegates.notNull()
+    override var keysData: Keys by Delegates.notNull()
 
     override fun generate() {
         val p = Long.pq.first

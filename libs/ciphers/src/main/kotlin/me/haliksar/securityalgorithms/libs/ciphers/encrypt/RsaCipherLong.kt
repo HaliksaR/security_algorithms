@@ -12,10 +12,8 @@ class RsaCipherLong :
 
     data class Keys(var publicKey: Pair<Long, Long>, var privateKey: Pair<Long, Long>)
 
-    data class HashData(val m: Byte, val s: Long)
-
     override var keys: Keys? = null
-    private var keysData: Keys by Delegates.notNull()
+    override var keysData: Keys by Delegates.notNull()
 
     override fun generate() {
         val p = Long.shortPrimeNumber

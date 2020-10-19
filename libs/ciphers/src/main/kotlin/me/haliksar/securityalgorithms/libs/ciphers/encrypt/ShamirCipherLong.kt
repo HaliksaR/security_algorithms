@@ -16,7 +16,6 @@ import kotlin.properties.Delegates
  * [keysData.a] числа, которые выбрал абонент A
  * [keysData.b] числа, которые выбрал абонент B
  */
-
 class ShamirCipherLong : Encrypt<Long, Long, ShamirCipherLong.Keys> {
 
     data class Keys(
@@ -28,7 +27,7 @@ class ShamirCipherLong : Encrypt<Long, Long, ShamirCipherLong.Keys> {
     }
 
     override var keys: Keys? = null
-    private var keysData: Keys by Delegates.notNull()
+    override var keysData: Keys by Delegates.notNull()
 
     class PrimeSet(
         private val name: String,

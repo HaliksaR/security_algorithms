@@ -9,15 +9,15 @@ class VernamCipherLong : Encrypt<Long, VernamCipherLong.DataRet, Long> {
     data class DataRet(val text: Long, val key: Long)
 
     override var keys: Long? = null
-    private var dataKey: Long by Delegates.notNull()
+    override var keysData: Long by Delegates.notNull()
     private var message: Long by Delegates.notNull()
 
     override fun encrypt(message: Long): DataRet {
         this.message = message
-        dataKey = Random.nextLong(Long.MIN_VALUE, this.message - 1L)
-        keys = dataKey
-        val ciphertext = dataKey.xor(this.message)
-        return DataRet(ciphertext, dataKey)
+        keysData = Random.nextLong(Long.MIN_VALUE, this.message - 1L)
+        keys = keysData
+        val ciphertext = keysData.xor(this.message)
+        return DataRet(ciphertext, keysData)
     }
 
     override fun decrypt(encryptData: DataRet): Long =
@@ -29,7 +29,6 @@ class VernamCipherLong : Encrypt<Long, VernamCipherLong.DataRet, Long> {
     }
 
     override fun validate() {
-        check(message in 0..dataKey) { "Ключ и сообщение должны быть одинакого размера" }
+        check(message in 0..keysData) { "Ключ и сообщение должны быть одинакого размера" }
     }
-
 }

@@ -15,7 +15,7 @@ class GostElectronicSignatureLong :
     data class Keys(val p: Long, val q: Long, val a: Long, val x: Long, val y: Long)
 
     override var keys: Keys? = null
-    private var keysData: Keys by Delegates.notNull()
+    override var keysData: Keys by Delegates.notNull()
 
     override fun generate() {
         val (p, q) = Long.pq
