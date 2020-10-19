@@ -11,7 +11,7 @@ import kotlin.properties.Delegates
 
 /**
  * Шифр Шамира
- *
+ * https://studme.org/239582/informatika/shifr_shamira#:~:text=%D0%A8%D0%B8%D1%84%D1%80%20%D0%A8%D0%B0%D0%BC%D0%B8%D1%80%D0%B0%20(Adi%20Shamir)%20%D0%B1%D1%8B%D0%BB,%D1%81%D0%BE%D0%BE%D0%B1%D1%89%D0%B5%D0%BD%D0%B8%D1%8F%20%D0%BF%D0%BE%D1%82%D1%80%D0%B5%D0%B1%D1%83%D0%B5%D1%82%20%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%BD%D0%B5%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D0%BE%D0%B3%D0%BE%20%D1%88%D0%B8%D1%84%D1%80%D0%B0.
  * [prime] заведомо большое простое число
  * [keysData.a] числа, которые выбрал абонент A
  * [keysData.b] числа, которые выбрал абонент B
@@ -50,7 +50,7 @@ class ShamirCipherLong : Encrypt<Long, Long, ShamirCipherLong.Keys> {
 
     override fun validate() {
         check(keysData.a.mutual.gcdTailRec(keysData.prime - 1L).nod == 1L) {
-            "Число mutuallyPrime1=$keysData.a.mutual должно быть взаимно простое с p - 1 = ${keysData.prime - 1L}"
+            "Число mutual1 = ${keysData.a.mutual} должно быть взаимно простое с p - 1 = ${keysData.prime - 1L}"
         }
         val mod = keysData.prime - 1L
         val modMutual = keysData.a.mutual % mod

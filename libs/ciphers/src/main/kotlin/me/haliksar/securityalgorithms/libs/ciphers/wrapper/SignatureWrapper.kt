@@ -1,37 +1,48 @@
 package me.haliksar.securityalgorithms.libs.ciphers.wrapper
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import me.haliksar.securityalgorithms.libs.ciphers.contract.ElectronicSignature
+import me.haliksar.securityalgorithms.libs.core.fileutils.writeTo
+import kotlin.system.measureTimeMillis
 
 class SignatureWrapper<M, E, K>(
-    name: String,
+    override val name: String,
     private val cipher: ElectronicSignature<M, E, K>,
-    private val dump: Boolean = true
-) {
+    override val dump: Boolean = true
+) : Dumper {
 
-    private fun dump(message: String) {
-        if (dump) {
-            println(message)
+    fun start(
+        path: String,
+        data: List<M>,
+        dataSource: Pair<String, String>,
+        singParallel: Boolean = false,
+        verifyParallel: Boolean = false
+    ): String {
+        dumpln("START ${dataSource.first + dataSource.second}")
+        val time = measureTimeMillis {
+            generate()
+            dump()
+            cipher.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)
+            val hash = sing(data, singParallel)
+            val verify = verify(hash, verifyParallel)
+            dump()
+            verify.writeTo("$path/verify/", "${dataSource.first}_verify.txt", dump)
         }
-    }
-
-    init {
-        dump(name)
+        dumpln("EXIT ${dataSource.first + dataSource.second}")
+        return "$name\t${dataSource.first + dataSource.second}\tTOTAL TIME $time ms"
     }
 
     fun generate() {
-        dump("Генерируем значения...")
+        dumpln("Генерируем значения...")
         cipher.generate()
-        dump("Проверяем сгенерированные значения...")
+        dumpln("Проверяем сгенерированные значения...")
         cipher.validate()
     }
 
     fun sing(messages: List<M>, parallel: Boolean): List<E> =
         runBlocking(Dispatchers.IO) {
-            dump("Начинаем подпись ключей...")
+            dumpln("Начинаем подпись ключей...")
             if (parallel) {
                 messages.parallelMap { cipher.sign(it) }
             } else {
@@ -41,20 +52,17 @@ class SignatureWrapper<M, E, K>(
 
     fun verify(hash: List<E>, parallel: Boolean): Boolean =
         runBlocking(Dispatchers.IO) {
-            dump("Начинаем расшифровку...")
+            dumpln("Начинаем расшифровку...")
             if (parallel) {
                 hash.parallelMap { cipher.verify(it) }.none { !it }
             } else {
                 hash.map { cipher.verify(it) }.none { !it }
             }.also {
                 if (it) {
-                    dump("Верификация прошла успешно!")
+                    dumpln("Верификация прошла успешно!")
                 } else {
-                    dump("Ошибка верификации")
+                    dumpln("Ошибка верификации")
                 }
             }
         }
-
-    private suspend fun <T, R> List<T>.parallelMap(block: suspend (T) -> R) =
-        coroutineScope { map { async { block(it) } }.map { it.await() } }
 }

@@ -1,41 +1,35 @@
 package me.haliksar.securityalgorithms.libs.ciphers
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 
 const val resource = "libs/ciphers/src/main/resources"
 
-fun <K, V> Map<K, V>.asFlow(): Flow<Pair<K, V>> = flow {
-    forEach { emit(it.key to it.value) }
-}
-
-val dataSources: Flow<Pair<String, String>> = mapOf(
+val dataSources: Map<String, String> = mapOf(
     "megumin" to ".png",
-    "file" to ".pdf",
+/*    "file" to ".pdf",
     "image" to ".jpg",
-    "Лабораторные работы" to ".pdf",
-).asFlow().flowOn(Dispatchers.IO)
+    "Лабораторные работы" to ".pdf",*/
+)
 
-val CoroutineScope.jobs: (Pair<String, String>, Boolean) -> List<Deferred<Unit>>
+val CoroutineScope.jobs: (Map<String, String>, Boolean) -> List<Deferred<String>>
     get() = { data, dump ->
-        listOf(
-            async { shamirCipherLong(data, dump) },
-            async { vernamCipherLong(data, dump) },
-            async { elGamaliaCipherLong(data, dump) },
-            async { rsaCipherLong(data, dump) },
-
-            async { elGamaliaLongSignature(data, dump) },
-            async { rsaLongSignature(data, dump) },
-            async { gostLongSignature(data, dump) }
-        )
+        mutableListOf<Deferred<String>>().apply {
+            data.forEach { pair ->
+                add(async { shamirCipherLong(pair.toPair(), dump) })
+                add(async { vernamCipherLong(pair.toPair(), dump) })
+                add(async { elGamaliaCipherLong(pair.toPair(), dump) })
+                add(async { rsaCipherLong(pair.toPair(), dump) })
+//
+//                add(async { elGamaliaLongSignature(pair.toPair(), dump) })
+//                add(async { rsaLongSignature(pair.toPair(), dump) })
+//                add(async { gostLongSignature(pair.toPair(), dump) })
+            }
+        }
     }
 
 fun main(): Unit = runBlocking(Dispatchers.IO) {
     val dump = true
-    dataSources.collect {
-        jobs(it, dump).forEach { it.await() }
-    }
+    val times = mutableListOf<String>()
+    jobs(dataSources, dump).forEach { times.add(it.await()) }
+    times.forEach { println(it) }
 }

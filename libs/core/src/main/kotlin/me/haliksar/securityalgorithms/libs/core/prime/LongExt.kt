@@ -83,5 +83,5 @@ val Long.Companion.pq: Pair<Long, Long>
 
 val Long.Companion.antiderivative: (Long) -> Long
     get() = {
-        Random.nextLong(1L, it - 1L)
+        Random.nextLong(1L, it)
     }

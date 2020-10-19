@@ -1,37 +1,51 @@
 package me.haliksar.securityalgorithms.libs.ciphers.wrapper
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import me.haliksar.securityalgorithms.libs.ciphers.contract.Encrypt
+import me.haliksar.securityalgorithms.libs.core.fileutils.writeTo
+import kotlin.system.measureTimeMillis
 
 class EncryptWrapper<M, E, K>(
-    name: String,
-    private val cipher: Encrypt<M, E, K>,
-    private val dump: Boolean = true
-) {
+    override val name: String,
+    private var cipher: Encrypt<M, E, K>,
+    override val dump: Boolean = true
+) : Dumper {
 
-    private fun dump(message: String) {
-        if (dump) {
-            println(message)
+
+    fun start(
+        path: String,
+        data: List<M>,
+        dataSource: Pair<String, String>,
+        encryptParallel: Boolean = false,
+        decryptParallel: Boolean = false
+    ): String {
+        dumpln("START ${dataSource.first + dataSource.second}")
+        val time = measureTimeMillis {
+            generate()
+            dump()
+            cipher.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)
+            val encrypt = encrypt(data, encryptParallel)
+            dump()
+            encrypt.writeTo("$path/encrypt/", "${dataSource.first}_encrypt${dataSource.second}", dump)
+            val decrypt = decrypt(encrypt, decryptParallel)
+            dump()
+            decrypt.writeTo("$path/decrypt/", "${dataSource.first}_decrypt${dataSource.second}", dump)
         }
-    }
-
-    init {
-        dump(name)
+        dumpln("EXIT ${dataSource.first + dataSource.second}")
+        return "$name\t${dataSource.first + dataSource.second}\tTOTAL TIME $time ms"
     }
 
     fun generate() {
-        dump("Генерируем значения...")
+        dumpln("Генерируем значения...")
         cipher.generate()
-        dump("Проверяем сгенерированные значения...")
+        dumpln("Проверяем сгенерированные значения...")
         cipher.validate()
     }
 
     fun encrypt(messages: List<M>, parallel: Boolean): List<E> =
         runBlocking(Dispatchers.IO) {
-            dump("Начинаем шифрование...")
+            dumpln("Начинаем шифрование...")
             if (parallel) {
                 messages.parallelMap { cipher.encrypt(it) }
             } else {
@@ -41,14 +55,11 @@ class EncryptWrapper<M, E, K>(
 
     fun decrypt(messages: List<E>, parallel: Boolean): List<M> =
         runBlocking(Dispatchers.IO) {
-            dump("Начинаем расшифровку...")
+            dumpln("Начинаем расшифровку...")
             if (parallel) {
                 messages.parallelMap { cipher.decrypt(it) }
             } else {
                 messages.map { cipher.decrypt(it) }
             }
         }
-
-    private suspend fun <T, R> List<T>.parallelMap(block: suspend (T) -> R) =
-        coroutineScope { map { async { block(it) } }.map { it.await() } }
 }

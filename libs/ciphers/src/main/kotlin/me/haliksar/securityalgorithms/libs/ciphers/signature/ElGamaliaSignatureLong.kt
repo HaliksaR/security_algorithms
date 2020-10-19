@@ -8,7 +8,6 @@ import me.haliksar.securityalgorithms.libs.core.prime.mutuallyPrime
 import me.haliksar.securityalgorithms.libs.core.prime.pq
 import me.haliksar.securityalgorithms.libs.gcd.long.gcdTailRec
 import me.haliksar.securityalgorithms.libs.modexp.long.modExpRec
-import kotlin.properties.Delegates
 
 class ElGamaliaSignatureLong :
     ElectronicSignature<Byte, ElGamaliaSignatureLong.HashData, ElGamaliaSignatureLong.Keys> {
@@ -18,13 +17,14 @@ class ElGamaliaSignatureLong :
     data class Keys(var p: Long, var g: Long, var x: Long, var y: Long, var k: Long)
 
     override var keys: Keys? = null
-    override var keysData: Keys by Delegates.notNull()
+
+    override lateinit var keysData: Keys
 
     override fun generate() {
         val p = Long.pq.first
-        val x = Long.antiderivative(p)
-        val g = Long.antiderivative(p)
-        val k = Long.antiderivative(p)
+        val x = Long.antiderivative(p - 1)
+        val g = Long.antiderivative(p - 1)
+        val k = Long.antiderivative(p - 2)
         val y = g.modExpRec(x, p)
         keysData = Keys(p, g, x, y, k)
         keys = keysData
@@ -38,7 +38,7 @@ class ElGamaliaSignatureLong :
             "Нарушено условие '1 < x < p-1'! [x = ${keysData.x}, p = ${keysData.p}]"
         }
         check(keysData.k in 1L until keysData.p) {
-            "Нарушено условие '1 < k < p-1'! [k = ${keysData.k}, p = ${keysData.p}]"
+            "Нарушено условие '1 < k < p-2'! [k = ${keysData.k}, p = ${keysData.p}]"
         }
         check(keysData.g.modExpRec(keysData.x, keysData.p) != 1L) {
             "Нарушено условие 'g ^ x mod p != 1' - число g должно быть первообразной корня по модулю p! [g = ${keysData.g}, x = ${keysData.x}, p = ${keysData.p}] "

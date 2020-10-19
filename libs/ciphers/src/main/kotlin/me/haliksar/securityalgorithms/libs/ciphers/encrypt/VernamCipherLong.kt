@@ -4,6 +4,7 @@ import me.haliksar.securityalgorithms.libs.ciphers.contract.Encrypt
 import kotlin.properties.Delegates
 import kotlin.random.Random
 
+// https://thecode.media/vernam/
 class VernamCipherLong : Encrypt<Long, VernamCipherLong.DataRet, Long> {
 
     data class DataRet(val text: Long, val key: Long)
@@ -29,6 +30,6 @@ class VernamCipherLong : Encrypt<Long, VernamCipherLong.DataRet, Long> {
     }
 
     override fun validate() {
-        check(message in 0..keysData) { "Ключ и сообщение должны быть одинакого размера" }
+        // ключ генерируется по сообщению
     }
 }

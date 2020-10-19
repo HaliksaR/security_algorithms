@@ -7,21 +7,23 @@ import me.haliksar.securityalgorithms.libs.core.prime.pq
 import me.haliksar.securityalgorithms.libs.modexp.long.modExpRec
 import kotlin.properties.Delegates
 
+
+// https://it.rfei.ru/course/~k017/~V8u3Fj4l/~hIGNMjZS
 class ElGamaliaCipherLong :
     Encrypt<Long, ElGamaliaCipherLong.DataRet, ElGamaliaCipherLong.Keys> {
 
     data class Keys(var p: Long, var g: Long, var x: Long, var y: Long, var k: Long)
 
-    data class DataRet(val a: Long, val b: Long)
+    data class DataRet(val r: Long, val e: Long)
 
     override var keys: Keys? = null
     override var keysData: Keys by Delegates.notNull()
 
     override fun generate() {
         val p = Long.pq.first
-        val x = Long.antiderivative(p)
-        val g = Long.antiderivative(p)
-        val k = Long.antiderivative(p)
+        val x = Long.antiderivative(p - 1)
+        val g = Long.antiderivative(p - 1)
+        val k = Long.antiderivative(p - 2)
         val y = g.modExpRec(x, p)
         keysData = Keys(p, g, x, y, k)
         keys = keysData
@@ -35,7 +37,7 @@ class ElGamaliaCipherLong :
             "Нарушено условие '1 < x < p-1'! [x = ${keysData.x}, p = ${keysData.p}]"
         }
         check(keysData.k in 1L until keysData.p) {
-            "Нарушено условие '1 < k < p-1'! [k = ${keysData.k}, p = ${keysData.p}]"
+            "Нарушено условие '1 < k < p-2'! [k = ${keysData.k}, p = ${keysData.p}]"
         }
         check(keysData.g.modExpRec(keysData.x, keysData.p) != 1L) {
             "Нарушено условие 'g ^ x mod p != 1' - число g должно быть первообразной корня по модулю p! [g = ${keysData.g}, x = ${keysData.x}, p = ${keysData.p}] "
@@ -46,11 +48,11 @@ class ElGamaliaCipherLong :
         check(message < keysData.p) {
             "Сообщение должно быть меньше чем [message = $message, p = ${keysData.p}]"
         }
-        val a = keysData.g.modExpRec(keysData.k, keysData.p)
-        val b = keysData.y.modExpRec(keysData.k, keysData.p, message)
-        return DataRet(a, b)
+        val r = keysData.g.modExpRec(keysData.k, keysData.p)
+        val e = keysData.y.modExpRec(keysData.k, keysData.p, message)
+        return DataRet(r, e)
     }
 
     override fun decrypt(encryptData: DataRet): Long =
-        encryptData.a.modExpRec(keysData.p - 1L - keysData.x, keysData.p, encryptData.b)
+        encryptData.r.modExpRec(keysData.p - 1L - keysData.x, keysData.p, encryptData.e)
 }

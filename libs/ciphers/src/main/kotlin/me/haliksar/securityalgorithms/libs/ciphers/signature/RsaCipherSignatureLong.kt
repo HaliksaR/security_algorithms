@@ -4,7 +4,7 @@ import me.haliksar.securityalgorithms.libs.ciphers.contract.ElectronicSignature
 import me.haliksar.securityalgorithms.libs.core.hashutils.SHA_256B
 import me.haliksar.securityalgorithms.libs.core.prime.multiplicativeInverse
 import me.haliksar.securityalgorithms.libs.core.prime.mutuallyPrime
-import me.haliksar.securityalgorithms.libs.core.prime.shortPrimeNumber
+import me.haliksar.securityalgorithms.libs.core.prime.randomPrimeNumber
 import me.haliksar.securityalgorithms.libs.modexp.long.modExpRec
 import kotlin.properties.Delegates
 
@@ -19,8 +19,8 @@ class RsaCipherSignatureLong :
     override var keysData: Keys by Delegates.notNull()
 
     override fun generate() {
-        val p = Long.shortPrimeNumber
-        val q = Long.shortPrimeNumber
+        val p = Long.randomPrimeNumber
+        val q = Long.randomPrimeNumber
         val n = p * q // модуль
         val f = (p - 1L) * (q - 1L) // функция Эйлера
         val e = Long.mutuallyPrime(f) // открытая экспонента, простая из чисел Ферма

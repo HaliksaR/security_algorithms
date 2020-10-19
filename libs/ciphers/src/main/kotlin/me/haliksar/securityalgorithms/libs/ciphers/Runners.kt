@@ -9,94 +9,73 @@ import me.haliksar.securityalgorithms.libs.ciphers.signature.GostSignatureLong
 import me.haliksar.securityalgorithms.libs.ciphers.signature.RsaCipherSignatureLong
 import me.haliksar.securityalgorithms.libs.ciphers.wrapper.EncryptWrapper
 import me.haliksar.securityalgorithms.libs.ciphers.wrapper.SignatureWrapper
-import me.haliksar.securityalgorithms.libs.core.fileutils.fileToByteArray
+import me.haliksar.securityalgorithms.libs.core.fileutils.fileToByteList
 import me.haliksar.securityalgorithms.libs.core.fileutils.fileToLongList
-import me.haliksar.securityalgorithms.libs.core.fileutils.writeTo
 
 
-fun shamirCipherLong(dataSource: Pair<String, String>, dump: Boolean = true) {
-    val path = "$resource/ShamirCipher"
-    val file = "$resource/${dataSource.first}${dataSource.second}".fileToLongList(dump)
-    val method = ShamirCipherLong()
-    val wrapper = EncryptWrapper("ShamirCipher", method, dump)
-    wrapper.generate()
-    method.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)
-    val encrypt = wrapper.encrypt(file, true)
-    encrypt.writeTo("$path/encrypt/", "${dataSource.first}_encrypt${dataSource.second}", dump)
-    val decrypt = wrapper.decrypt(encrypt, true)
-    decrypt.writeTo("$path/decrypt/", "${dataSource.first}_decrypt${dataSource.second}", dump)
-}
+fun shamirCipherLong(dataSource: Pair<String, String>, dump: Boolean = true): String =
+    EncryptWrapper("ShamirCipher", ShamirCipherLong(), dump)
+        .start(
+            path = "$resource/ShamirCipher",
+            data = "$resource/${dataSource.first}${dataSource.second}".fileToLongList(dump),
+            dataSource = dataSource,
+            encryptParallel = true,
+            decryptParallel = true
+        )
 
-fun vernamCipherLong(dataSource: Pair<String, String>, dump: Boolean = true) {
-    val path = "$resource/VernamCipher"
-    val file = "$resource/${dataSource.first}${dataSource.second}".fileToLongList(dump)
-    val method = VernamCipherLong()
-    val wrapper = EncryptWrapper("VernamCipher", method, dump)
-    method.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt")
-    val encrypt = wrapper.encrypt(file, false)
-    encrypt.writeTo("$path/encrypt/", "${dataSource.first}_encrypt${dataSource.second}", dump)
-    val decrypt = wrapper.decrypt(encrypt, true)
-    decrypt.writeTo("$path/decrypt/", "${dataSource.first}_decrypt${dataSource.second}", dump)
-}
+fun vernamCipherLong(dataSource: Pair<String, String>, dump: Boolean = true): String =
+    EncryptWrapper("VernamCipher", VernamCipherLong(), dump)
+        .start(
+            path = "$resource/VernamCipher",
+            data = "$resource/${dataSource.first}${dataSource.second}".fileToLongList(dump),
+            dataSource = dataSource,
+            encryptParallel = false,
+            decryptParallel = true
+        )
 
-fun rsaCipherLong(dataSource: Pair<String, String>, dump: Boolean = true) {
-    val path = "$resource/RsaCipher"
-    val file = "$resource/${dataSource.first}${dataSource.second}".fileToLongList(dump)
-    val method = RsaCipherLong()
-    val wrapper = EncryptWrapper("RsaCipher", method, dump)
-    wrapper.generate()
-    method.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)
-    val encrypt = wrapper.encrypt(file, false)
-    encrypt.writeTo("$path/encrypt/", "${dataSource.first}_encrypt${dataSource.second}", dump)
-    val decrypt = wrapper.decrypt(encrypt, true)
-    decrypt.writeTo("$path/decrypt/", "${dataSource.first}_decrypt${dataSource.second}", dump)
-}
+fun rsaCipherLong(dataSource: Pair<String, String>, dump: Boolean = true): String =
+    EncryptWrapper("RsaCipher", RsaCipherLong(), dump)
+        .start(
+            path = "$resource/RsaCipher",
+            data = "$resource/${dataSource.first}${dataSource.second}".fileToLongList(dump),
+            dataSource = dataSource,
+            encryptParallel = true,
+            decryptParallel = true
+        )
 
-fun elGamaliaCipherLong(dataSource: Pair<String, String>, dump: Boolean = true) {
-    val path = "$resource/ElGamaliaCipher"
-    val file = "$resource/${dataSource.first}${dataSource.second}".fileToLongList(dump)
-    val method = ElGamaliaCipherLong()
-    val wrapper = EncryptWrapper("ElGamaliaCipher", method, dump)
-    wrapper.generate()
-    method.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)
-    val encrypt = wrapper.encrypt(file, false)
-    encrypt.writeTo("$path/encrypt/", "${dataSource.first}_encrypt${dataSource.second}", dump)
-    val decrypt = wrapper.decrypt(encrypt, true)
-    decrypt.writeTo("$path/decrypt/", "${dataSource.first}_decrypt${dataSource.second}", dump)
-}
+fun elGamaliaCipherLong(dataSource: Pair<String, String>, dump: Boolean = true): String =
+    EncryptWrapper("ElGamaliaCipher", ElGamaliaCipherLong(), dump)
+        .start(
+            path = "$resource/ElGamaliaCipher",
+            data = "$resource/${dataSource.first}${dataSource.second}".fileToLongList(dump),
+            dataSource = dataSource,
+            encryptParallel = true,
+            decryptParallel = true
+        )
 
-fun rsaLongSignature(dataSource: Pair<String, String>, dump: Boolean = true) {
-    val path = "$resource/RsaSignature"
-    val file = "$resource/${dataSource.first}${dataSource.second}".fileToByteArray(dump)
-    val method = RsaCipherSignatureLong()
-    val wrapper = SignatureWrapper("RsaCipherSignature", method, dump)
-    wrapper.generate()
-    method.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)
-    val hash = wrapper.sing(file.toList(), false)
-    val verify = wrapper.verify(hash, false)
-    verify.writeTo("$path/verify/", "${dataSource.first}_verify.txt", dump)
-}
+fun rsaLongSignature(dataSource: Pair<String, String>, dump: Boolean = true): String =
+    SignatureWrapper("RsaSignature", RsaCipherSignatureLong(), dump).start(
+        path = "$resource/RsaSignature",
+        data = "$resource/${dataSource.first}${dataSource.second}".fileToByteList(dump),
+        dataSource = dataSource,
+        verifyParallel = true,
+        singParallel = true
+    )
 
-fun elGamaliaLongSignature(dataSource: Pair<String, String>, dump: Boolean = true) {
-    val path = "$resource/ElGamaliaSignature"
-    val file = "$resource/${dataSource.first}${dataSource.second}".fileToByteArray(dump)
-    val method = ElGamaliaSignatureLong()
-    val wrapper = SignatureWrapper("ElGamaliaCipherSignature", method, dump)
-    wrapper.generate()
-    method.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)
-    val hash = wrapper.sing(file.toList(), false)
-    val verify = wrapper.verify(hash, false)
-    verify.writeTo("$path/verify/", "${dataSource.first}_verify.txt", dump)
-}
+fun elGamaliaLongSignature(dataSource: Pair<String, String>, dump: Boolean = true): String =
+    SignatureWrapper("ElGamaliaSignature", ElGamaliaSignatureLong(), dump).start(
+        path = "$resource/ElGamaliaSignature",
+        data = "$resource/${dataSource.first}${dataSource.second}".fileToByteList(dump),
+        dataSource = dataSource,
+        verifyParallel = true,
+        singParallel = false
+    )
 
-fun gostLongSignature(dataSource: Pair<String, String>, dump: Boolean = true) {
-    val path = "$resource/GostSignature"
-    val file = "$resource/${dataSource.first}${dataSource.second}".fileToByteArray(dump)
-    val method = GostSignatureLong()
-    val wrapper = SignatureWrapper("GostElectronicSignature", method, dump)
-    wrapper.generate()
-    method.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)
-    val hash = wrapper.sing(file.toList(), true)
-    val verify = wrapper.verify(hash, true)
-    verify.writeTo("$path/verify/", "${dataSource.first}_verify.txt", dump)
-}
+fun gostLongSignature(dataSource: Pair<String, String>, dump: Boolean = true): String =
+    SignatureWrapper("GostSignature", GostSignatureLong(), dump).start(
+        path = "$resource/GostSignature",
+        data = "$resource/${dataSource.first}${dataSource.second}".fileToByteList(dump),
+        dataSource = dataSource,
+        verifyParallel = true,
+        singParallel = true
+    )
