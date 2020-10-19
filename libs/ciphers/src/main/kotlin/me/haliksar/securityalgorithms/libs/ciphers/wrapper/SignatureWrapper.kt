@@ -1,36 +1,32 @@
-package me.haliksar.securityalgorithms.libs.ciphers
+package me.haliksar.securityalgorithms.libs.ciphers.wrapper
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
+import me.haliksar.securityalgorithms.libs.ciphers.contract.ElectronicSignature
 
-class EncryptWrapper<M, E, K>(
-    private val cipher: Encrypt<M, E, K>
+class SignatureWrapper<M, E, K>(
+    private val cipher: ElectronicSignature<M, E, K>
 ) {
 
-    fun generate(): K {
+    fun generate() {
         println("Генерируем значения..")
-        val keys = cipher.generate()
+        cipher.generate()
         println("Проверяем сгенерированные значения..")
         cipher.validate()
-        return keys
     }
 
-    fun encrypt(messages: List<M>): List<E> =
+    fun sing(messages: List<M>): List<E> =
         runBlocking(Dispatchers.IO) {
-            println("Начинаем шифрование..")
-            messages.parallelMap { cipher.encrypt(it) }.also {
-                println(it.size)
-            }
+            println("Начинаем подпись ключей..")
+            messages.map { cipher.sign(it) }
         }
 
-    fun decrypt(messages: List<E>): List<M> =
+    fun verify(hash: List<E>): Boolean =
         runBlocking(Dispatchers.IO) {
             println("Начинаем расшифровку..")
-            messages.parallelMap { cipher.decrypt(it) }.also {
-                println(it.size)
-            }
+            hash.parallelMap { cipher.verify(it) }.none { !it }
         }
 
     private suspend fun <T, R> List<T>.parallelMap(block: suspend (T) -> R) =

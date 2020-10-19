@@ -8,7 +8,6 @@ package me.haliksar.securityalgorithms.libs.modexp.long
  * @param mod [Long] модуль возведения в степень
  * @return [this]^[pow] (mod [mod])
  **/
-@ExperimentalUnsignedTypes
 fun Long.modExpRec(pow: Long, mod: Long): Long {
     if (pow == 0L) return 1L
     val result = (this * this % mod).modExpRec(pow / 2, mod)
@@ -23,7 +22,6 @@ fun Long.modExpRec(pow: Long, mod: Long): Long {
  * @param mod [Long] модуль возведения в степень
  * @return [this]^[pow] (mod [mod])
  **/
-@ExperimentalUnsignedTypes
 fun Long.modExp(pow: Long, mod: Long): Long {
     var a: Long = this
     var b: Long = pow
@@ -47,7 +45,6 @@ fun Long.modExp(pow: Long, mod: Long): Long {
  * @param factor [Long] множитель
  * @return [this]^[pow] (mod [mod])
  **/
-@ExperimentalUnsignedTypes
 fun Long.modExpRec(pow: Long, mod: Long, factor: Long): Long = (this.modExpRec(pow, mod) * factor % mod) % mod
 
 /**
@@ -59,10 +56,8 @@ fun Long.modExpRec(pow: Long, mod: Long, factor: Long): Long = (this.modExpRec(p
  * @param factor [Long] множитель
  * @return [this]^[pow] (mod [mod])
  **/
-@ExperimentalUnsignedTypes
 fun Long.modExp(pow: Long, mod: Long, factor: Long): Long = (this.modExp(pow, mod) * factor % mod) % mod
 
-@ExperimentalUnsignedTypes
 fun main() {
     println(10L.modExpRec(15L, 7L))
     println(10L.modExp(15L, 7L))

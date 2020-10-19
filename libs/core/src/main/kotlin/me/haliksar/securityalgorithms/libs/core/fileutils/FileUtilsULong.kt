@@ -5,7 +5,7 @@ import java.io.FileOutputStream
 @ExperimentalUnsignedTypes
 fun String.toULongList(): List<ULong> {
     val list = mutableListOf<ULong>()
-    for (element in toByteArray())
+    for (element in fileToByteArray())
         list.add(element.toULong())
     return list.toList()
 }

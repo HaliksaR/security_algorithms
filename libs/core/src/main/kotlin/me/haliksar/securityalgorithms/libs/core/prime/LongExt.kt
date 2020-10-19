@@ -60,3 +60,19 @@ fun Long.isPrime(): Boolean {
     }
     return true
 }
+
+val Long.Companion.pq: () -> Pair<Long, Long>
+    get() = {
+        var p: Long
+        var q: Long
+        do {
+            p = Long.randomPrimeNumber
+            q = (p - 1) / 2
+        } while (!q.isPrime())
+        Pair(p, q)
+    }
+
+val Long.Companion.antiderivative: (Long) -> Long
+    get() = {
+        Random.nextLong(1L, it - 1L)
+    }
