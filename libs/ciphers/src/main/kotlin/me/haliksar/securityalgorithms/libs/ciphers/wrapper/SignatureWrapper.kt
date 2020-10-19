@@ -17,16 +17,24 @@ class SignatureWrapper<M, E, K>(
         cipher.validate()
     }
 
-    fun sing(messages: List<M>): List<E> =
+    fun sing(messages: List<M>, parallel: Boolean): List<E> =
         runBlocking(Dispatchers.IO) {
             println("Начинаем подпись ключей..")
-            messages.map { cipher.sign(it) }
+            if (parallel) {
+                messages.parallelMap { cipher.sign(it) }
+            } else {
+                messages.map { cipher.sign(it) }
+            }
         }
 
-    fun verify(hash: List<E>): Boolean =
+    fun verify(hash: List<E>, parallel: Boolean): Boolean =
         runBlocking(Dispatchers.IO) {
             println("Начинаем расшифровку..")
-            hash.parallelMap { cipher.verify(it) }.none { !it }
+            if (parallel) {
+                hash.parallelMap { cipher.verify(it) }.none { !it }
+            } else {
+                hash.map { cipher.verify(it) }.none { !it }
+            }
         }
 
     private suspend fun <T, R> List<T>.parallelMap(block: suspend (T) -> R) =

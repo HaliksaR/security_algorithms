@@ -17,16 +17,24 @@ class EncryptWrapper<M, E, K>(
         cipher.validate()
     }
 
-    fun encrypt(messages: List<M>): List<E> =
+    fun encrypt(messages: List<M>, parallel: Boolean): List<E> =
         runBlocking(Dispatchers.IO) {
             println("Начинаем шифрование..")
-            messages.parallelMap { cipher.encrypt(it) }
+            if (parallel) {
+                messages.parallelMap { cipher.encrypt(it) }
+            } else {
+                messages.map { cipher.encrypt(it) }
+            }
         }
 
-    fun decrypt(messages: List<E>): List<M> =
+    fun decrypt(messages: List<E>, parallel: Boolean): List<M> =
         runBlocking(Dispatchers.IO) {
             println("Начинаем расшифровку..")
-            messages.parallelMap { cipher.decrypt(it) }
+            if (parallel) {
+                messages.parallelMap { cipher.decrypt(it) }
+            } else {
+                messages.map { cipher.decrypt(it) }
+            }
         }
 
     private suspend fun <T, R> List<T>.parallelMap(block: suspend (T) -> R) =
