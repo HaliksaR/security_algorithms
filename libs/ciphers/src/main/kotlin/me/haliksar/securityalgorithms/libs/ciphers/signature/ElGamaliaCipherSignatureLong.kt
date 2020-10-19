@@ -1,4 +1,4 @@
-package me.haliksar.securityalgorithms.libs.ciphers.cipher
+package me.haliksar.securityalgorithms.libs.ciphers.signature
 
 import me.haliksar.securityalgorithms.libs.ciphers.contract.ElectronicSignature
 import me.haliksar.securityalgorithms.libs.core.hashutils.SHA_256L

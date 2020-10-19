@@ -1,6 +1,12 @@
 package me.haliksar.securityalgorithms.libs.ciphers
 
-import me.haliksar.securityalgorithms.libs.ciphers.cipher.*
+import me.haliksar.securityalgorithms.libs.ciphers.encrypt.ElGamaliaCipherLong
+import me.haliksar.securityalgorithms.libs.ciphers.encrypt.RsaCipherLong
+import me.haliksar.securityalgorithms.libs.ciphers.encrypt.ShamirCipherLong
+import me.haliksar.securityalgorithms.libs.ciphers.encrypt.VernamCipherLong
+import me.haliksar.securityalgorithms.libs.ciphers.signature.ElGamaliaCipherSignatureLong
+import me.haliksar.securityalgorithms.libs.ciphers.signature.GostElectronicSignatureLong
+import me.haliksar.securityalgorithms.libs.ciphers.signature.RsaCipherSignatureLong
 import me.haliksar.securityalgorithms.libs.ciphers.wrapper.EncryptWrapper
 import me.haliksar.securityalgorithms.libs.ciphers.wrapper.SignatureWrapper
 import me.haliksar.securityalgorithms.libs.core.fileutils.fileToByteArray
@@ -11,8 +17,8 @@ const val resource = "libs/ciphers/src/main/resources"
 
 val dataSources = mapOf(
     "megumin" to ".png",
-    "file" to ".pdf",
-    "image" to ".jpg",
+/*    "file" to ".pdf",
+    "image" to ".jpg",*/
 )
 
 fun shamirCipherLong() {
@@ -63,7 +69,7 @@ fun rsaCipherLongSignature() {
     val path = "$resource/RsaCipherSignature"
     dataSources.forEach { (name, type) ->
         val file = "$resource/$name$type".fileToByteArray()
-        val method = RsaCipherLong()
+        val method = RsaCipherSignatureLong()
         val wrapper = SignatureWrapper("RsaCipherSignature", method)
         wrapper.generate()
         method.keys?.writeTo("$path/keys/", "${name}_keys.txt")
@@ -119,11 +125,11 @@ fun gostElectronicSignatureLongSignature() {
 fun main() {
 //    shamirCipherLong()
 //    vernamCipherLong()
-    elGamaliaCipherLong()
-//    rsaCipherLong()
-
-    elGamaliaCipherLongSignature()
-//    rsaCipherLongSignature()
+//    elGamaliaCipherLong()
+    rsaCipherLong()
+//
+//    elGamaliaCipherLongSignature()
+    rsaCipherLongSignature()
 
 //    gostElectronicSignatureLongSignature()
 }

@@ -1,4 +1,4 @@
-package me.haliksar.securityalgorithms.libs.ciphers.cipher
+package me.haliksar.securityalgorithms.libs.ciphers.encrypt
 
 import me.haliksar.securityalgorithms.libs.ciphers.contract.Encrypt
 import kotlin.properties.Delegates
