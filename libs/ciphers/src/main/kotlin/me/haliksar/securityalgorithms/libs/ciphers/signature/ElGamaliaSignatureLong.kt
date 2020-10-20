@@ -5,7 +5,7 @@ import me.haliksar.securityalgorithms.libs.core.hashutils.SHA_256L
 import me.haliksar.securityalgorithms.libs.core.prime.antiderivative
 import me.haliksar.securityalgorithms.libs.core.prime.isPrime
 import me.haliksar.securityalgorithms.libs.core.prime.mutuallyPrime
-import me.haliksar.securityalgorithms.libs.core.prime.pq
+import me.haliksar.securityalgorithms.libs.core.prime.randomPrimeNumber
 import me.haliksar.securityalgorithms.libs.gcd.long.gcdTailRec
 import me.haliksar.securityalgorithms.libs.modexp.long.modExpRec
 
@@ -21,7 +21,7 @@ class ElGamaliaSignatureLong :
     override lateinit var keysData: Keys
 
     override fun generate() {
-        val p = Long.pq.first
+        val p = Long.randomPrimeNumber
         val x = Long.antiderivative(p - 1)
         val g = Long.antiderivative(p - 1)
         val k = Long.antiderivative(p - 2)

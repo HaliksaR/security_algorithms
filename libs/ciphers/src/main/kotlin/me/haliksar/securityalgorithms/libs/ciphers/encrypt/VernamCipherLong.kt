@@ -17,8 +17,7 @@ class VernamCipherLong : Encrypt<Long, VernamCipherLong.DataRet, Long> {
         this.message = message
         keysData = Random.nextLong(Long.MIN_VALUE, this.message - 1L)
         keys = keysData
-        val ciphertext = keysData.xor(this.message)
-        return DataRet(ciphertext, keysData)
+        return DataRet(keysData.xor(this.message), keysData)
     }
 
     override fun decrypt(encryptData: DataRet): Long =

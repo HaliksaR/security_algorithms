@@ -3,7 +3,7 @@ package me.haliksar.securityalgorithms.libs.ciphers.encrypt
 import me.haliksar.securityalgorithms.libs.ciphers.contract.Encrypt
 import me.haliksar.securityalgorithms.libs.core.prime.antiderivative
 import me.haliksar.securityalgorithms.libs.core.prime.isPrime
-import me.haliksar.securityalgorithms.libs.core.prime.pq
+import me.haliksar.securityalgorithms.libs.core.prime.randomPrimeNumber
 import me.haliksar.securityalgorithms.libs.modexp.long.modExpRec
 import kotlin.properties.Delegates
 
@@ -12,7 +12,7 @@ import kotlin.properties.Delegates
 class ElGamaliaCipherLong :
     Encrypt<Long, ElGamaliaCipherLong.DataRet, ElGamaliaCipherLong.Keys> {
 
-    data class Keys(var p: Long, var g: Long, var x: Long, var y: Long, var k: Long)
+    data class Keys(var p: Long, var g: Long, var c: Long, var d: Long, var k: Long)
 
     data class DataRet(val r: Long, val e: Long)
 
@@ -20,7 +20,7 @@ class ElGamaliaCipherLong :
     override var keysData: Keys by Delegates.notNull()
 
     override fun generate() {
-        val p = Long.pq.first
+        val p = Long.randomPrimeNumber
         val x = Long.antiderivative(p - 1)
         val g = Long.antiderivative(p - 1)
         val k = Long.antiderivative(p - 2)
@@ -33,14 +33,14 @@ class ElGamaliaCipherLong :
         check(keysData.p.isPrime()) {
             "По алгоритму Ферма число q = ${keysData.p} должно быть простым!"
         }
-        check(keysData.x in 1L until keysData.p) {
-            "Нарушено условие '1 < x < p-1'! [x = ${keysData.x}, p = ${keysData.p}]"
+        check(keysData.c in 1L until keysData.p) {
+            "Нарушено условие '1 < x < p-1'! [x = ${keysData.c}, p = ${keysData.p}]"
         }
         check(keysData.k in 1L until keysData.p) {
             "Нарушено условие '1 < k < p-2'! [k = ${keysData.k}, p = ${keysData.p}]"
         }
-        check(keysData.g.modExpRec(keysData.x, keysData.p) != 1L) {
-            "Нарушено условие 'g ^ x mod p != 1' - число g должно быть первообразной корня по модулю p! [g = ${keysData.g}, x = ${keysData.x}, p = ${keysData.p}] "
+        check(keysData.g.modExpRec(keysData.c, keysData.p) != 1L) {
+            "Нарушено условие 'g ^ x mod p != 1' - число g должно быть первообразной корня по модулю p! [g = ${keysData.g}, x = ${keysData.c}, p = ${keysData.p}] "
         }
     }
 
@@ -49,10 +49,10 @@ class ElGamaliaCipherLong :
             "Сообщение должно быть меньше чем [message = $message, p = ${keysData.p}]"
         }
         val r = keysData.g.modExpRec(keysData.k, keysData.p)
-        val e = keysData.y.modExpRec(keysData.k, keysData.p, message)
+        val e = keysData.d.modExpRec(keysData.k, keysData.p, message)
         return DataRet(r, e)
     }
 
     override fun decrypt(encryptData: DataRet): Long =
-        encryptData.r.modExpRec(keysData.p - 1L - keysData.x, keysData.p, encryptData.e)
+        encryptData.r.modExpRec(keysData.p - 1L - keysData.c, keysData.p, encryptData.e)
 }
