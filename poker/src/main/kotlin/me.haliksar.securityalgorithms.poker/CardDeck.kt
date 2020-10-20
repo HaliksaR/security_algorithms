@@ -2,7 +2,7 @@ package me.haliksar.securityalgorithms.poker
 
 import me.haliksar.securityalgorithms.libs.core.prime.mutuallyPrime
 
-class CardDeck {
+class CardDeck(p: Long) {
     private val suits: List<String> = listOf("♠", "♣", "♥", "♦")
 
     private val typeCart: List<String> = listOf("2", "3", "4", "5", "6", "7", "8", "9", "10", "В", "Д", "К", "T")
@@ -19,15 +19,13 @@ class CardDeck {
 
     override fun toString(): String = cards.joinToString("\n")
 
-    private val cardsWithId = mutableMapOf<Long, Card>()
+    private val cardsWithId: MutableMap<Long, Card> = mutableMapOf<Long, Card>().apply {
+        do {
+            putAll(cards.map { name -> Long.mutuallyPrime(p - 1L) to name })
+        } while (keys.size != keys.distinct().size)
+    }
 
     fun getCardsWithId(): Map<Long, Card> = cardsWithId.toMap()
-
-    fun generateId(p: Long) {
-        do {
-            cardsWithId.putAll(cards.map { name -> Long.mutuallyPrime(p - 1L) to name })
-        } while (cardsWithId.size != cards.size)
-    }
 }
 
 fun CardDeck.Card.printCart() {

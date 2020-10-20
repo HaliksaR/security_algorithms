@@ -12,19 +12,16 @@ class MentalPoker(countPlayers: Int) {
         check(countPlayers in 2..23) { "Игроков должно быть от 2 до 23" }
     }
 
-    private val cardDeck by lazy { CardDeck() }
-    private var encryptCardDeck = setOf<Long>()
+    private val p = Long.randomPrimeNumber
 
-    private val p by lazy { Long.randomPrimeNumber }
+    private val cardDeck by lazy { CardDeck(p) }
+
+    private var encryptCardDeck = setOf<Long>()
 
     private val cardOnTable = mutableSetOf<Long>()
 
     private val playerList = mutableListOf<Player>().apply {
         repeat(countPlayers) { add(Player(p)) }
-    }
-
-    private fun generateDesk() {
-        cardDeck.generateId(p)
     }
 
     private fun playersShuffled() {
@@ -81,7 +78,6 @@ class MentalPoker(countPlayers: Int) {
     }
 
     fun handOutCards() {
-        generateDesk()
         playersShuffled()
         playersGetCarts()
         showPlayersCartsBack()
