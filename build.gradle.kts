@@ -35,6 +35,7 @@ subprojects {
     dependencies {
         implementation(kotlin("stdlib-jdk8", version = "1.4.10"))
         implementation(kotlin("compiler-embeddable", version = "1.4.10"))
+        implementation("com.github.ajalt.mordant:mordant:2.0.0-alpha1")
     }
 
     compileKotlin.kotlinOptions.jvmTarget = "1.8"

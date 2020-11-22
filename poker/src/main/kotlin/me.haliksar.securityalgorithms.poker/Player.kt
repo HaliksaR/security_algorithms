@@ -1,8 +1,8 @@
 package me.haliksar.securityalgorithms.poker
 
 import me.haliksar.securityalgorithms.libs.core.prime.mutuallyPrime
-import me.haliksar.securityalgorithms.libs.gcd.long.gcdTailRec
-import me.haliksar.securityalgorithms.libs.modexp.long.modExpRec
+import me.haliksar.securityalgorithms.libs.gcd.gcdTailRec
+import me.haliksar.securityalgorithms.libs.modexp.modExpRec
 
 class Player(private val p: Long) {
 

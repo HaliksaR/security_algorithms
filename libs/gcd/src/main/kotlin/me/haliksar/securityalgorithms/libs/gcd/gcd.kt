@@ -1,4 +1,4 @@
-package me.haliksar.securityalgorithms.libs.gcd.long
+package me.haliksar.securityalgorithms.libs.gcd
 
 data class GcdPack
 constructor(var nod: Long, var x: Long, var y: Long)
@@ -48,7 +48,7 @@ private tailrec fun Long.goTailRec(
     x: Long,
     y: Long,
     prevX: Long,
-    prevY: Long
+    prevY: Long,
 ): GcdPack =
     if (b == 0L) {
         GcdPack(this, prevX, prevY)

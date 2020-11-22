@@ -1,65 +1,83 @@
 package me.haliksar.securityalgorithms.libs.ciphers.wrapper
 
+import com.github.ajalt.mordant.terminal.TextColors
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import me.haliksar.securityalgorithms.libs.ciphers.Resource
 import me.haliksar.securityalgorithms.libs.ciphers.contract.Encrypt
+import me.haliksar.securityalgorithms.libs.ciphers.resources
 import me.haliksar.securityalgorithms.libs.core.fileutils.writeTo
+import java.io.File
 import kotlin.system.measureTimeMillis
 
-class EncryptWrapper<M, E, K>(
+class EncryptWrapper<M : Any, E : Any, K : Any>(
     override val name: String,
-    private var cipher: Encrypt<M, E, K>,
-    override val dump: Boolean = true
-) : Dumper {
+    private val cipher: Encrypt<M, E, K>,
+    override val dump: Boolean = true,
+    override val resource: Resource,
+) : Dumper() {
 
-
-    fun start(
+    suspend fun start(
         path: String,
         data: List<M>,
-        dataSource: Pair<String, String>,
         encryptParallel: Boolean = false,
-        decryptParallel: Boolean = false
-    ): String {
-        dumpln("START ${dataSource.first + dataSource.second}")
+        decryptParallel: Boolean = false,
+    ): String = withContext(Dispatchers.IO) {
+        dumpln("START ${resource.file}")
         val time = measureTimeMillis {
-            generate()
-            dump()
-            cipher.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)
-            val encrypt = encrypt(data, encryptParallel)
-            dump()
-            encrypt.writeTo("$path/encrypt/", "${dataSource.first}_encrypt${dataSource.second}", dump)
-            val decrypt = decrypt(encrypt, decryptParallel)
-            dump()
-            decrypt.writeTo("$path/decrypt/", "${dataSource.first}_decrypt${dataSource.second}", dump)
+            val keys = generate().also {
+                dump()
+                it.writeTo("$path/keys/", "${resource.name}.keys", dump)
+            }
+
+            val encrypt = encrypt(data, encryptParallel, keys).also {
+                dump()
+                it.writeTo("$path/encrypt/", "${resource.name}_encrypt${resource.type}", dump)
+            }
+
+            decrypt(encrypt, decryptParallel, keys).also {
+                dump()
+                it.writeTo("$path/decrypt/", "${resource.name}_decrypt${resource.type}", dump)
+            }
+            compareFiles(path)
         }
-        dumpln("EXIT ${dataSource.first + dataSource.second}")
-        return "$name\t${dataSource.first + dataSource.second}\tTOTAL TIME $time ms"
+        dumpln("EXIT")
+        "$name\t${resource.file}\tTOTAL TIME $time ms"
     }
 
-    fun generate() {
-        dumpln("Генерируем значения...")
-        cipher.generate()
-        dumpln("Проверяем сгенерированные значения...")
-        cipher.validate()
+    private fun generate(): K {
+        dumpln("Generate values...")
+        return cipher.generate().also {
+            dumpln("Validate values...")
+            cipher.validate(it)
+        }
     }
 
-    fun encrypt(messages: List<M>, parallel: Boolean): List<E> =
-        runBlocking(Dispatchers.IO) {
-            dumpln("Начинаем шифрование...")
-            if (parallel) {
-                messages.parallelMap { cipher.encrypt(it) }
-            } else {
-                messages.map { cipher.encrypt(it) }
-            }
+    private suspend fun encrypt(messages: List<M>, parallel: Boolean, keys: K): List<E> {
+        dumpln("Encrypt...")
+        return if (parallel) {
+            messages.parallelMap { cipher.encrypt(it, keys) }
+        } else {
+            messages.map { cipher.encrypt(it, keys) }
         }
+    }
 
-    fun decrypt(messages: List<E>, parallel: Boolean): List<M> =
-        runBlocking(Dispatchers.IO) {
-            dumpln("Начинаем расшифровку...")
-            if (parallel) {
-                messages.parallelMap { cipher.decrypt(it) }
-            } else {
-                messages.map { cipher.decrypt(it) }
-            }
+    private suspend fun decrypt(messages: List<E>, parallel: Boolean, keys: K): List<M> {
+        dumpln("Decrypt...")
+        return if (parallel) {
+            messages.parallelMap { cipher.decrypt(it, keys) }
+        } else {
+            messages.map { cipher.decrypt(it, keys) }
         }
+    }
+
+    private fun compareFiles(path: String) {
+        val decrypt = File("$path/decrypt/", "${resource.name}_decrypt${resource.type}").readBytes()
+        val orig = File("$resources/${resource.file}").readBytes()
+        if (decrypt.contentEquals(orig)) {
+            dumpln("Files equals!", TextColors.green)
+        } else {
+            dumpln("Files not equals!", TextColors.red)
+        }
+    }
 }

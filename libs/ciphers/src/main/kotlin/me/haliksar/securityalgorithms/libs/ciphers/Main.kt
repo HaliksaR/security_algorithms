@@ -1,38 +1,41 @@
 package me.haliksar.securityalgorithms.libs.ciphers
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
-const val resource = "libs/ciphers/src/main/resources"
+const val resources = "libs/ciphers/src/main/resources"
 
-val dataSources: Map<String, String> = mapOf(
-    "megumin" to ".png",
-    "file" to ".pdf",
-    "image" to ".jpg",
-    "Лабораторные работы" to ".pdf",
+data class Resource(val name: String, val type: String) {
+    val file = name + type
+}
+
+val dataSources: List<Resource> = listOf(
+    Resource("megumin", ".png"),
+//    Resource("file", ".pdf"),
+//    Resource("image", ".jpg"),
+//    Resource("Лабораторные работы", ".pdf"),
 )
 
-val CoroutineScope.jobs: (Map<String, String>, Boolean) -> List<Deferred<String>>
-    get() = { data, dump ->
+val jobs: CoroutineScope.(List<Resource>, Boolean) -> List<Deferred<String>>
+    get() = { resources, dump ->
         mutableListOf<Deferred<String>>().apply {
-            data.forEach { pair ->
-//                add(async { shamirCipherLong(pair.toPair(), dump) })
-//                add(async { vernamCipherLong(pair.toPair(), dump) })
-//                add(async { elGamaliaCipherLong(pair.toPair(), dump) })
-//                add(async { rsaCipherLong(pair.toPair(), dump) })
-//
-//                add(async { elGamaliaLongSignature(pair.toPair(), dump) })
-//                add(async { rsaLongSignature(pair.toPair(), dump) })
-//                add(async { gostLongSignature(pair.toPair(), dump) })
+            resources.forEach { resource ->
+                add(async { resource.shamirCipher(dump) })
+//                add(async { resource.vernamCipher(dump) })
+//                add(async { resource.elGamaliaCipher(dump) })
+//                add(async { resource.rsaCipher(dump) })
+
+                add(async { resource.elGamaliaSignature(dump) })
+//                add(async { resource.rsaSignature(dump) })
+//                add(async { resource.gostSignature(dump) })
             }
         }
     }
 
-fun main(): Unit = runBlocking(Dispatchers.IO) {
+fun main(): Unit = runBlocking {
     val dump = true
-    val times = mutableListOf<String>()
-    jobs(dataSources, dump).forEach { times.add(it.await()) }
-    times.forEach { println(it) }
+    launch {
+        jobs(dataSources, dump)
+            .awaitAll()
+            .forEach { println(it) }
+    }
 }

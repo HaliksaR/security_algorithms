@@ -1,9 +1,9 @@
 package me.haliksar.securityalgorithms.libs.core.prime
 
-import me.haliksar.securityalgorithms.libs.gcd.long.gcdTailRec
+import me.haliksar.securityalgorithms.libs.gcd.gcdTailRec
 import kotlin.random.Random
 
-internal const val MAX_RANDOM_RANGEL = 32000L //10 ^ 9
+internal const val MAX_RANDOM_RANGEL = 32_000L //10 ^ 9
 internal const val MIN_RANDOM_RANGEL = 1L
 
 fun randomLong(limit: Long): Long = (1L until limit).random()

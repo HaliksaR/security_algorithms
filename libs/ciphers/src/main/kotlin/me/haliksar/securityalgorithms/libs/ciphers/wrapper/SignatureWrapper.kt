@@ -1,68 +1,81 @@
 package me.haliksar.securityalgorithms.libs.ciphers.wrapper
 
+import com.github.ajalt.mordant.terminal.TextColors
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import me.haliksar.securityalgorithms.libs.ciphers.Resource
 import me.haliksar.securityalgorithms.libs.ciphers.contract.ElectronicSignature
+import me.haliksar.securityalgorithms.libs.core.fileutils.fileToListObject
+import me.haliksar.securityalgorithms.libs.core.fileutils.writeByteTo
 import me.haliksar.securityalgorithms.libs.core.fileutils.writeTo
 import kotlin.system.measureTimeMillis
 
-class SignatureWrapper<M, E, K>(
+class SignatureWrapper<M : Any, K : Any, S : Any>(
     override val name: String,
-    private val cipher: ElectronicSignature<M, E, K>,
-    override val dump: Boolean = true
-) : Dumper {
+    private val cipher: ElectronicSignature<M, K, S>,
+    override val dump: Boolean = true,
+    override val resource: Resource,
+) : Dumper() {
 
-    fun start(
+    suspend fun start(
         path: String,
         data: List<M>,
-        dataSource: Pair<String, String>,
         singParallel: Boolean = false,
-        verifyParallel: Boolean = false
-    ): String {
-        dumpln("START ${dataSource.first + dataSource.second}")
+        verifyParallel: Boolean = false,
+    ): String = withContext(Dispatchers.IO) {
+        dumpln("START ${resource.file}")
         val time = measureTimeMillis {
-            generate()
-            dump()
-            cipher.keys?.writeTo("$path/keys/", "${dataSource.first}_keys.txt", dump)
-            val hash = sing(data, singParallel)
-            val verify = verify(hash, verifyParallel)
-            dump()
-            verify.writeTo("$path/verify/", "${dataSource.first}_verify.txt", dump)
-        }
-        dumpln("EXIT ${dataSource.first + dataSource.second}")
-        return "$name\t${dataSource.first + dataSource.second}\tTOTAL TIME $time ms"
-    }
+            val keys = generate().also {
+                dump()
+                it.writeTo("$path/keys/", "${resource.name}.keys", dump)
+            }
 
-    fun generate() {
-        dumpln("Генерируем значения...")
-        cipher.generate()
-        dumpln("Проверяем сгенерированные значения...")
-        cipher.validate()
-    }
+            sing(data, singParallel, keys).also {
+                dump()
+                it.writeByteTo("$path/signature/", "${resource.name}.signature", dump)
+            }
 
-    fun sing(messages: List<M>, parallel: Boolean): List<E> =
-        runBlocking(Dispatchers.IO) {
-            dumpln("Начинаем подпись ключей...")
-            if (parallel) {
-                messages.parallelMap { cipher.sign(it) }
-            } else {
-                messages.map { cipher.sign(it) }
+            dump()
+            val signatures = "$path/signature/${resource.name}.signature".fileToListObject<List<S>>()
+
+            verify(data, signatures, verifyParallel, keys).also {
+                dump()
+                it.writeTo("$path/verify/", "${resource.name}.verify", dump)
             }
         }
+        dumpln("EXIT")
+        "$name\t${resource.file}\tTOTAL TIME $time ms"
+    }
 
-    fun verify(hash: List<E>, parallel: Boolean): Boolean =
-        runBlocking(Dispatchers.IO) {
-            dumpln("Начинаем расшифровку...")
-            if (parallel) {
-                hash.parallelMap { cipher.verify(it) }.none { !it }
+    private fun generate(): K {
+        dumpln("Generate values...")
+        return cipher.generate().also {
+            dumpln("Validate values...")
+            cipher.validate(it)
+        }
+    }
+
+    private suspend fun sing(messages: List<M>, parallel: Boolean, keys: K): List<S> {
+        dumpln("Sign keys...")
+        return if (parallel) {
+            messages.parallelMap { cipher.sign(it, keys) }
+        } else {
+            messages.map { cipher.sign(it, keys) }
+        }
+    }
+
+    private suspend fun verify(messages: List<M>, hash: List<S>, parallel: Boolean, keys: K): Boolean {
+        dumpln("Verify...")
+        return if (parallel) {
+            messages.zip(hash).parallelMap { cipher.verify(it.first, it.second, keys) }.none { !it }
+        } else {
+            messages.zip(hash).map { cipher.verify(it.first, it.second, keys) }.none { !it }
+        }.also {
+            if (it) {
+                dumpln("Verify done!", TextColors.green)
             } else {
-                hash.map { cipher.verify(it) }.none { !it }
-            }.also {
-                if (it) {
-                    dumpln("Верификация прошла успешно!")
-                } else {
-                    dumpln("Ошибка верификации")
-                }
+                dumpln("Error verify", TextColors.red)
             }
         }
+    }
 }

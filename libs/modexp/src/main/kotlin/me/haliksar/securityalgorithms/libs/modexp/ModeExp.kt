@@ -1,4 +1,4 @@
-package me.haliksar.securityalgorithms.libs.modexp.long
+package me.haliksar.securityalgorithms.libs.modexp
 
 /**
  * Функция быстрого возведения числа в степень по модулю рекурсивно.
