@@ -4,14 +4,6 @@ import me.haliksar.securityalgorithms.libs.core.prime.randomPrimeNumber
 
 // https://ru.wikipedia.org/wiki/%D0%9C%D0%B5%D0%BD%D1%82%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9_%D0%BF%D0%BE%D0%BA%D0%B5%D1%80
 class MentalPoker(countPlayers: Int) {
-    private companion object {
-        const val COUNT_CART_ON_TABLE = 5
-        const val COUNT_CART_TO_PLAYER = 2
-    }
-
-    init {
-        check(countPlayers in 2..23) { "Игроков должно быть от 2 до 23" }
-    }
 
     private val p = Long.randomPrimeNumber
 
@@ -19,76 +11,67 @@ class MentalPoker(countPlayers: Int) {
 
     private var encryptCardDeck = setOf<Long>()
 
-    private val cardOnTable = mutableSetOf<Long>()
+    private val recipients: MutableSet<Recipient>
 
-    private val playerList = mutableListOf<Player>().apply {
-        repeat(countPlayers) { add(Player(p)) }
-    }
+    private fun action(action: (Recipient) -> Unit) = recipients.forEach { action(it) }
 
-    private fun playersShuffled() {
-        encryptCardDeck = playerList.fold(cardDeck.getCardsWithId().keys) { acc, player ->
-            player.encryptDeck(acc)
+    private fun fold(initial: Set<Long>, action: (Set<Long>, Recipient) -> Set<Long>) {
+        var accumulator = initial
+        for (element in recipients) {
+            accumulator = action(accumulator, element)
         }
+        encryptCardDeck = accumulator
     }
 
-    private fun playersGetCarts() {
-        encryptCardDeck = playerList.fold(encryptCardDeck) { acc, player ->
-            player.getEncryptCart(acc, COUNT_CART_TO_PLAYER)
-        }
-    }
-
-    private fun putCardOnTable() { // TODO FIX надо обойти шифрование, либо шифровать вместе с игроками
-        encryptCardDeck = encryptCardDeck.shuffled().toMutableSet().apply {
-            cardOnTable.addAll(take(COUNT_CART_ON_TABLE))
-            removeAll(cardOnTable)
-        }
-    }
-
-    private fun decryptPlayersCarts() {
-        playerList.forEach { player ->
-            val userEncryptCardDeck = player.getCardsInHands()
-            val othersPlayers = playerList.filter { other -> other != player }
-            val userDecryptCardDeck = othersPlayers.fold(userEncryptCardDeck) { acc, player ->
-                player.decryptDeck(acc)
+    init {
+        check(countPlayers in 2..23) { "Игроков должно быть от 2 до 23" }
+        recipients = mutableSetOf<Recipient>().apply {
+            for (number in 0 until countPlayers) {
+                add(Player(p, number + 1))
             }
-            player.takeDesk(userDecryptCardDeck)
+            add(Table(p))
         }
     }
 
-    private fun showPlayersCarts() {
-        playerList.forEachIndexed { index, player ->
-            println("Игрок №${index + 1}:")
-            player.showDeckInHand(cardDeck.getCardsWithId())
-            println()
+    private fun recipientsShuffled() {
+        fold(cardDeck.cardsWithId.keys) { acc, recipient ->
+            recipient.encrypt(acc.shuffled().toSet())
         }
     }
 
-    private fun showPlayersCartsBack() {
-        playerList.forEachIndexed { index, player ->
-            println("Игрок №${index + 1}:")
-            player.showDeckInHandBack()
-            println()
+    private fun recipientsGetCarts() {
+        fold(encryptCardDeck) { acc, recipient ->
+            recipient.getEncryptCarts(acc)
         }
     }
 
-    private fun showOnTableCarts(cardsWithId: Map<Long, CardDeck.Card>) {
-        println("Карты на столе:")
-        cardOnTable.forEach {
-            cardsWithId[it]?.printCart()
+    private fun decryptRecipientsCarts() {
+        action { recipient ->
+            recipient.decrypt(recipients)
         }
     }
 
-    fun handOutCards() {
-        playersShuffled()
-        playersGetCarts()
-        showPlayersCartsBack()
-        putCardOnTable()
-        decryptPlayersCarts()
-        showPlayersCarts()
-        showOnTableCarts(cardDeck.getCardsWithId())
+    private fun showRecipientsCarts() {
+        action { recipient ->
+            recipient.showCards(cardDeck)
+        }
+    }
+
+    private fun showRecipientsCartsBack() {
+        action { recipient ->
+            recipient.showCardsBack()
+        }
+    }
+
+    fun launch() {
+        recipientsShuffled()
+        recipientsGetCarts()
+        showRecipientsCartsBack()
+        decryptRecipientsCarts()
+        showRecipientsCarts()
     }
 }
 
 fun main() {
-    MentalPoker(12).handOutCards()
+    MentalPoker(2).launch()
 }

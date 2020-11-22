@@ -1,45 +1,14 @@
 package me.haliksar.securityalgorithms.poker
 
-import me.haliksar.securityalgorithms.libs.core.prime.mutuallyPrime
-import me.haliksar.securityalgorithms.libs.gcd.gcdTailRec
-import me.haliksar.securityalgorithms.libs.modexp.modExpRec
+class Player(
+    p: Long,
+    number: Int,
+    override val name: String = "Игрок N$number",
+    override val count: Int = COUNT_CART_TO_PLAYER
+) : Recipient(p) {
 
-class Player(private val p: Long) {
+    private companion object {
 
-    private var ca: Long = Long.mutuallyPrime(p - 1L)
-    private var da: Long = (p - 1L + ca.gcdTailRec(p - 1L).x) % (p - 1L)
-
-    private val cardsInHandsEncrypt = mutableSetOf<Long>()
-    fun getCardsInHands() = cardsInHandsEncrypt.toSet()
-
-    private val cardDeckInHands = mutableSetOf<Long>()
-    fun getCardDeckInHands() = cardDeckInHands.toSet()
-
-    init {
-        check((ca * da) % (p - 1L) == 1L) { "Нарушено условие: (ca * da) % (p - 1) == 1" }
+        const val COUNT_CART_TO_PLAYER = 2
     }
-
-    fun encryptDeck(cardsId: Set<Long>): Set<Long> =
-        cardsId.map { it.modExpRec(ca, p) }.shuffled().toSet()
-
-    fun getEncryptCart(cardsId: Set<Long>, countCart: Int): Set<Long> =
-        cardsId.shuffled().toMutableSet().apply {
-            cardsInHandsEncrypt.addAll(take(countCart))
-            removeAll(cardsInHandsEncrypt)
-        }
-
-    fun decryptDeck(cardsId: Set<Long>): Set<Long> =
-        cardsId.map { it.modExpRec(da, p) }.toSet()
-
-    fun takeDesk(userDecryptCardDeck: Set<Long>) {
-        val decryptDesk = decryptDeck(userDecryptCardDeck)
-        cardDeckInHands.addAll(decryptDesk)
-    }
-
-    fun showDeckInHand(cardsWithId: Map<Long, CardDeck.Card>) =
-        cardDeckInHands.forEach {
-            cardsWithId[it]?.printCart()
-        }
-
-    fun showDeckInHandBack() = repeat(cardsInHandsEncrypt.size) { printCartBack() }
 }

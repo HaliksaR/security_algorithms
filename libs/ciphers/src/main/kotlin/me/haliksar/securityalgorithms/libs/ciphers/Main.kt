@@ -31,7 +31,7 @@ val jobs: CoroutineScope.(List<Resource>, Boolean) -> List<Deferred<String>>
         }
     }
 
-fun main(): Unit = runBlocking {
+fun main() = runBlocking<Unit> {
     val dump = true
     launch {
         jobs(dataSources, dump)
