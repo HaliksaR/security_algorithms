@@ -6,6 +6,7 @@ import me.haliksar.securityalgorithms.libs.core.prime.mutuallyPrime
 import me.haliksar.securityalgorithms.libs.core.prime.randomPrimeNumber
 import me.haliksar.securityalgorithms.libs.modexp.modExpRec
 
+//https://bit.nmu.org.ua/ua/student/metod/cryptology/%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D1%8F19.pdf
 class RsaCipherSignature :
     ElectronicSignature<Long, RsaCipherSignature.Keys, Long> {
 

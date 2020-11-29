@@ -68,7 +68,7 @@ suspend fun Resource.elGamaliaSignature(dump: Boolean = true): String =
         verifyParallel = true,
         singParallel = true
     )
-
+//гост + мд5
 suspend fun Resource.gostSignature(dump: Boolean = true): String =
     SignatureWrapper("GostSignature", GostSignature(), dump, this).start(
         path = "$resources/GostSignature",

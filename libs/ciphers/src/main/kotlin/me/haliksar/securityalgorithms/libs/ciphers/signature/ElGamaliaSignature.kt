@@ -40,14 +40,14 @@ class ElGamaliaSignature :
                 "The message must be less than [message = $message, p = ${p}]"
             }
 
-            val k = Long.mutuallyPrime(p - 1) // генерирует случайное целое число К
-            check(k in 1L until p) {
-                "Invalid '1 < k < p-1'! [k = ${k}, p = ${p}]"
+            val r = Long.mutuallyPrime(p - 1) // генерирует случайное целое число r
+            check(r in 1L until p) {
+                "Invalid '1 < k < p-1'! [k = ${r}, p = ${p}]"
             }
-            val a = g.modExpRec(k, p) // а = G^K mod Р
+            val a = g.modExpRec(r, p) // а = g^r mod p
 
-            // b = (H - ax) k^-1 (mod p - 1)
-            val gcd = k gcdTailRec p - 1
+            // b = (H - ax) r^-1 (mod p - 1)
+            val gcd = r gcdTailRec p - 1
             var kInv = gcd.x
             if (kInv < 1) kInv += p - 1
             var u = (message - x * a) % (p - 1)

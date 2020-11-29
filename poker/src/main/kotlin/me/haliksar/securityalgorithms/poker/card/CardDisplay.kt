@@ -1,4 +1,4 @@
-package me.haliksar.securityalgorithms.poker
+package me.haliksar.securityalgorithms.poker.card
 
 interface CardDisplay {
 

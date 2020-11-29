@@ -50,13 +50,14 @@ class GostSignature :
                 val gcd = message gcdTailRec q
                 var hInv = gcd.x
                 if (hInv < 1) hInv += p - 1
+                // z1 = (s * v) mod q
                 val sv = (s * hInv) % q
                 var qrv = ((q - r) * hInv) % q
                 if (qrv < 1) qrv += q
-                // z1 = (s * v) mod q
                 val az1 = a.modExpRec(sv, p)
                 // z2 = ((q-r) * v) mod q
                 val yz2 = y.modExpRec(qrv, p)
+                // u = ((аz1 * уz2 ) mod р) mod p.
                 val u = ((az1 * yz2) % p) % q
                 u == r // Если u = r, то подпись считается верной.
             }

@@ -19,14 +19,14 @@ val jobs: CoroutineScope.(List<Resource>, Boolean) -> List<Deferred<String>>
     get() = { resources, dump ->
         mutableListOf<Deferred<String>>().apply {
             resources.forEach { resource ->
-                add(async { resource.shamirCipher(dump) })
+//                add(async { resource.shamirCipher(dump) })
 //                add(async { resource.vernamCipher(dump) })
 //                add(async { resource.elGamaliaCipher(dump) })
 //                add(async { resource.rsaCipher(dump) })
 
                 add(async { resource.elGamaliaSignature(dump) })
-//                add(async { resource.rsaSignature(dump) })
-//                add(async { resource.gostSignature(dump) })
+                add(async { resource.rsaSignature(dump) })
+                add(async { resource.gostSignature(dump) })
             }
         }
     }

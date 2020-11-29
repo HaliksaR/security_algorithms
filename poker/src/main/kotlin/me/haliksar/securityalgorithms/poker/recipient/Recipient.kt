@@ -1,10 +1,14 @@
-package me.haliksar.securityalgorithms.poker
+package me.haliksar.securityalgorithms.poker.recipient
 
 import me.haliksar.securityalgorithms.libs.core.prime.mutuallyPrime
 import me.haliksar.securityalgorithms.libs.gcd.gcdTailRec
 import me.haliksar.securityalgorithms.libs.modexp.modExpRec
+import me.haliksar.securityalgorithms.poker.card.Card
+import me.haliksar.securityalgorithms.poker.card.CardDeck
+import me.haliksar.securityalgorithms.poker.card.CardDisplay
 
-abstract class Recipient(private val p: Long) : CardDisplay {
+abstract class Recipient(private val p: Long) :
+    CardDisplay {
 
     abstract val name: String
     abstract val count: Int
