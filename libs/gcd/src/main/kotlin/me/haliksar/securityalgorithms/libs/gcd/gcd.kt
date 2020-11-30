@@ -30,6 +30,8 @@ infix fun Long.gcd(b: Long): GcdPack {
     return packU
 }
 
+infix fun Long.extendedGcd(b: Long): GcdPack = if (b > this) b.gcd(this) else this.gcd(b)
+
 /**
  * Функция, реализующая обобщённый алгоритм Евклида через хвостовую рекурсию.
  * https://ru.wikipedia.org/wiki/%D0%A5%D0%B2%D0%BE%D1%81%D1%82%D0%BE%D0%B2%D0%B0%D1%8F_%D1%80%D0%B5%D0%BA%D1%83%D1%80%D1%81%D0%B8%D1%8F
@@ -43,6 +45,8 @@ infix fun Long.gcd(b: Long): GcdPack {
  */
 infix fun Long.gcdTailRec(b: Long): GcdPack = this.goTailRec(b, 0L, 1L, 1L, 0L)
 
+infix fun Long.extendedGcdTailRec(b: Long): GcdPack = if (b > this) b.gcdTailRec(this) else this.gcdTailRec(b)
+
 private tailrec fun Long.goTailRec(
     b: Long,
     x: Long,
@@ -53,12 +57,12 @@ private tailrec fun Long.goTailRec(
     if (b == 0L) {
         GcdPack(this, prevX, prevY)
     } else {
-        val q = this / b
-        b.goTailRec(this % b, prevX - q * x, prevY - q * y, x, y)
+        b.goTailRec(this % b, prevX - (this / b) * x, prevY - (this / b) * y, x, y)
     }
 
 
 fun main() {
     println(22L gcd 44L)
+    println(22L extendedGcdTailRec 44L)
     println(22L gcdTailRec 44L)
 }

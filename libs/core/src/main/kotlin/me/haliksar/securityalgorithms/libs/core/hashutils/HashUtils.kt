@@ -1,5 +1,7 @@
 package me.haliksar.securityalgorithms.libs.core.hashutils
 
+import com.google.common.hash.Hashing
+import java.nio.charset.Charset
 import java.security.MessageDigest
 
 
@@ -26,3 +28,8 @@ val Byte.SHA_256B: Byte
         bytes[0] = this
         return MessageDigest.getInstance("SHA-256").digest(bytes)[0]
     }
+
+val String.md5L: Long
+    get() = Hashing.md5()
+        .hashString(this, Charset.defaultCharset())
+        .asLong()
