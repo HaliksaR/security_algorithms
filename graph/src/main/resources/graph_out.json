@@ -1,0 +1,58 @@
+{
+  "edges": [
+    {
+      "nodeId1": 0,
+      "nodeId2": 1
+    },
+    {
+      "nodeId1": 1,
+      "nodeId2": 2
+    },
+    {
+      "nodeId1": 1,
+      "nodeId2": 3
+    },
+    {
+      "nodeId1": 1,
+      "nodeId2": 4
+    },
+    {
+      "nodeId1": 2,
+      "nodeId2": 3
+    },
+    {
+      "nodeId1": 3,
+      "nodeId2": 4
+    },
+    {
+      "nodeId1": 4,
+      "nodeId2": 5
+    }
+  ],
+  "nodes": [
+    {
+      "color": "blue",
+      "id": 0
+    },
+    {
+      "color": "red",
+      "id": 1
+    },
+    {
+      "color": "blue",
+      "id": 2
+    },
+    {
+      "color": "blue",
+      "id": 3
+    },
+    {
+      "color": "blue",
+      "id": 4
+    },
+    {
+      "color": "green",
+      "id": 5
+    }
+  ]
+}
