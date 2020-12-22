@@ -26,13 +26,14 @@ class GraphRepositoryImpl(
         dataSource.show(graph)
     }
 
-    override suspend fun processing(graph: Graph) {
+    override suspend fun processing(graph: Graph): Boolean {
         repeat(graph.edges.size) {
             client.shuffle(graph)
             val edge = server.chooseEdge(graph)
             if (server.check(graph, edge)) {
-                return
+                return false
             }
         }
+        return true
     }
 }

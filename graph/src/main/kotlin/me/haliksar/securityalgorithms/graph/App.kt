@@ -44,7 +44,9 @@ class App : KoinComponent {
         get<SaveGraphUseCase>().invoke(graph, "graph/src/main/resources/graph_save.json")
 
         println("Processing...")
-        get<ProcessingGraphUseCase>().invoke(graph)
+        if (get<ProcessingGraphUseCase>().invoke(graph)) {
+            println("Valid Graph")
+        }
     }
 
     private suspend fun fromFileStrategy(filePath: String) {
@@ -53,7 +55,9 @@ class App : KoinComponent {
 
 
         println("Processing...")
-        get<ProcessingGraphUseCase>().invoke(graph)
+        if (get<ProcessingGraphUseCase>().invoke(graph)) {
+            println("Valid Graph")
+        }
     }
 
     private suspend fun fromFilesStrategy(input: String, output: String) {
@@ -61,10 +65,11 @@ class App : KoinComponent {
         val graph = get<GetGraphUseCase>().invoke(input)
 
         println("Processing...")
-        get<ProcessingGraphUseCase>().invoke(graph)
-
-        println("Save file...")
-        get<SaveGraphUseCase>().invoke(graph, output)
+        if (get<ProcessingGraphUseCase>().invoke(graph)) {
+            println("Valid Graph")
+            println("Save file...")
+            get<SaveGraphUseCase>().invoke(graph, output)
+        }
     }
 }
 

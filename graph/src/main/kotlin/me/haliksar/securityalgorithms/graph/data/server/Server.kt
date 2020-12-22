@@ -23,6 +23,7 @@ class ServerImpl : Server {
             println("Node[${current.nodeId1}] != Node[${current.nodeId2}]")
         } else {
             println("Node[${current.nodeId1}] == Node[${current.nodeId2}]")
+            println("Invalid Graph")
         }
         return val1 == val2
     }

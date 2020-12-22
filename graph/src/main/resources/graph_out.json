@@ -31,15 +31,15 @@
   ],
   "nodes": [
     {
-      "color": "blue",
+      "color": "red",
       "id": 0
     },
     {
-      "color": "red",
+      "color": "blue",
       "id": 1
     },
     {
-      "color": "blue",
+      "color": "red",
       "id": 2
     },
     {
@@ -47,7 +47,7 @@
       "id": 3
     },
     {
-      "color": "blue",
+      "color": "red",
       "id": 4
     },
     {

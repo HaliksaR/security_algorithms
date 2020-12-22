@@ -1,7 +1,6 @@
 package me.haliksar.securityalgorithms.graph.data.client
 
 import me.haliksar.securityalgorithms.graph.domain.entity.Graph
-import me.haliksar.securityalgorithms.graph.domain.entity.Node
 
 interface Client {
 
@@ -11,6 +10,10 @@ interface Client {
 class ClientImpl : Client {
 
     override fun shuffle(graph: Graph) {
-        graph.nodes.forEach(Node::generate)
+        val colorList = graph.nodes.map { it.color }.shuffled()
+        colorList.forEachIndexed { index, color ->
+            graph.nodes[index].color = color
+            graph.nodes[index].generate()
+        }
     }
 }

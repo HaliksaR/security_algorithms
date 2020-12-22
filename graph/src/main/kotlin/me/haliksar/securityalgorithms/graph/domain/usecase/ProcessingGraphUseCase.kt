@@ -8,7 +8,6 @@ class ProcessingGraphUseCase(
     private val repository: GraphRepository,
 ) {
 
-    suspend operator fun invoke(graph: Graph) {
+    suspend operator fun invoke(graph: Graph): Boolean =
         repository.processing(graph)
-    }
 }

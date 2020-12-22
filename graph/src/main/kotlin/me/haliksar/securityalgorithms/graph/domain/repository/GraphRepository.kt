@@ -12,5 +12,5 @@ interface GraphRepository {
 
     suspend fun show(graph: Graph)
 
-    suspend fun processing(graph: Graph)
+    suspend fun processing(graph: Graph): Boolean
 }

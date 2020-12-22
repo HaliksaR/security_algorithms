@@ -22,7 +22,6 @@ data class Node(
 
 
     fun generate() {
-        color = Color.values().random()
         calculateR()
         calculateZ()
     }
